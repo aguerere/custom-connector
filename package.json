@@ -26,7 +26,7 @@
     "passport-local": "~0.1.6",
     "ejs": "~0.8.3",
     "cookie-sessions": "0.0.2",
-    "wsfed": "~0.3.0",
-    "connector-setup": "git+https://github.com/auth0/connector-setup.git"
+    "connector-setup": "git+https://github.com/auth0/connector-setup.git",
+    "wsfed": "~0.3.3"
   }
 }

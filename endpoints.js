@@ -2,7 +2,7 @@ var fs       = require('fs');
 var path     = require('path');
 var passport = require('passport');
 var wsfed    = require('wsfed');
-var config   = require('./config');
+var config   = require('./config.json');
 
 
 var issuer = config.WSFED_ISSUER;
@@ -17,13 +17,13 @@ var respondWsFederation = wsfed.auth({
   cert:        credentials.cert,
   key:         credentials.key,
   getPostURL:  function (wtrealm, wreply, req, callback) {
-    var realmPostURLs = config['REALM'][wtrealm];
+    var realmPostURLs = config['REALMS'][wtrealm];
     if (realmPostURLs) {
       realmPostURLs = realmPostURLs.split(',');
       if (wreply && ~realmPostURLs.indexOf(wreply)) {
         return callback(null, wreply);
       }
-      if(!wreply){
+      if (!wreply) {
         return callback(null, realmPostURLs[0]);
       }
     }

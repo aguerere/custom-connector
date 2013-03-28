@@ -1,35 +1,46 @@
 var http     = require('http');
 var express  = require('express');
 var passport = require('passport');
+var connectorSetup = require('connector-setup');
 
-var config = require('./config.json');
+connectorSetup.run(__dirname, function(err, config) {
 
-require('./setupPassport');
+  if(err) {
+    console.log(err.message);
+    process.exit(2);
+  }
+    
+  require('./setupPassport');
 
-var cookieSessions = require('cookie-sessions');
-var app = express();
+  var cookieSessions = require('cookie-sessions');
+  var app = express();
 
 
-//configure the webserver
-app.configure(function(){
-  this.set('view engine', 'ejs');
-  this.set('views', __dirname + '/views');
+  //configure the webserver
+  app.configure(function(){
+    this.set('view engine', 'ejs');
+    this.set('views', __dirname + '/views');
 
-  this.use(express.static(__dirname + '/public'));
-  
-  this.use(express.cookieParser());
-  this.use(express.bodyParser());
-  this.use(cookieSessions({
-    session_key:    'sqlfs',
-    secret:         config.SESSION_SECRET
-  }));
+    this.use(express.static(__dirname + '/public'));
+    
+    this.use(express.cookieParser());
+    this.use(express.bodyParser());
+    this.use(cookieSessions({
+      session_key:    'sqlfs',
+      secret:         config.SESSION_SECRET
+    }));
 
-  this.use(passport.initialize());
-  this.use(this.router);
+    this.use(passport.initialize());
+    this.use(this.router);
+  });
+
+
+  require('./endpoints').install(app);
+
+  var port = process.env.PORT || config.PORT || 4000;
+
+  http.createServer(app)
+    .listen(port, function () {
+      console.log('listening on http://localhost:' + port);
+    });
 });
-
-
-require('./endpoints').install(app);
-
-http.createServer(app)
-    .listen(config.PORT || 4000);

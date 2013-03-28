@@ -1,6 +1,5 @@
 iisnode/*
 config.json
-users.js
-node_modules/bcrypt
 npm-debug.log
 .rnd
+certs/cert*
