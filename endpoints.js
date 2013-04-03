@@ -67,6 +67,7 @@ exports.install = function (app) {
 
   app.get('/logout', function (req, res) {
     console.log('user ' + req.session.user.displayName.green + ' logged out');
+    req.logout();
     delete req.session;
     res.send('bye');
   });
