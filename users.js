@@ -7,17 +7,16 @@ var users = [
       familyName: 'user',
       givenName:  'test'
     }, 
-    emails:   [ { value: 'foo@bar.com'} ],
-    validPassword: function (pwd) {
-      return pwd === '123';
-    }
+    emails:   [ { value: 'foo@bar.com'} ]
   }
 ];
 
-exports.findByName = function (name, callback) {
+exports.getProfile = function (name, password, callback) {
   var user = users.filter(function (user) { 
     return user.username === name;
   })[0];
 
+  if (password !== '123') return callback();
+  
   return callback(null, user);
 };

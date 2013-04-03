@@ -1,15 +1,7 @@
-/*
- * this is an example user class for sql server.
- * Passwords in this example are bcrypted.
- * 
- * It requires the msnodesql and bcrypt modules
- */
-
-
 var sql      = require('msnodesql');
 var config   = require('./config');
 var conn_str = config.SQL_CONNECTION_STRING;
-var bcrypt   = require('bcrypt');
+// var bcrypt   = require('bcrypt');
 
 function mapProfileToPassportProfile (userProfile) {
   var passportUser = {
@@ -19,20 +11,20 @@ function mapProfileToPassportProfile (userProfile) {
       familyName: userProfile.lastname,
       givenName:  userProfile.firstname
     }, 
-    emails:   [{value: userProfile.email}],
-    validPassword: function (pwd) {
-      return bcrypt.compareSync(pwd, userProfile.password);
-    }
+    emails:   [{value: userProfile.email}]
   };
 
   return passportUser;
 }
 
 
-exports.findByName = function (name, callback) {
+exports.getProfile = function (username, password, callback) {
   sql.open(conn_str, function (err, conn) {
     if(err) return callback(err);
-    conn.queryRaw("SELECT id, name, displayname, lastname, firstname, password, email FROM Users where name = ?", [name], function (err, results) {
+
+    conn.queryRaw("SELECT id, name, displayname, lastname, firstname, password, email FROM Users where name = ?", 
+                  [username], function (err, results) {
+
       if(err) return callback(err);
       
       if(!results.rows[0]) return callback(null , null);
@@ -43,7 +35,12 @@ exports.findByName = function (name, callback) {
         return prev;
       }, {});
 
-      //map row to passport user schema
+      // validate password with the passwordHash..
+      // if(!bcrypt.compareSync(password, userProfile.password)) {
+      //   return callback();
+      // } 
+
+      //map row to profile
       passportUser = mapProfileToPassportProfile(userProfile);
 
       callback(null, passportUser);

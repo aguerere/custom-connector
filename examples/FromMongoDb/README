@@ -1,0 +1,5 @@
+This is an example of user script using mongodb.
+
+1. Copy users.js to the root folder.
+2. Edit users.js to match your desired logic.
+3. Run "npm install mongodb" from the root of this project.

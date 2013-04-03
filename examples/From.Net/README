@@ -1,0 +1,5 @@
+This is an example of user script using the .Net.
+
+1. Copy users.csx and users.js to the root folder.
+2. Edit users.csx to match your desired logic.
+3. Run "npm install edge" from the root of this project.
