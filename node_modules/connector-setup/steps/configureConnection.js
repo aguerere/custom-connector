@@ -18,7 +18,7 @@ var getCurrentThumbprint = function (workingPath) {
   return thumbprint.calculate(cert);
 };
 
-module.exports = function (program, workingPath, connectionInfo, currentConfig, ticket, auth0Url, cb) {
+module.exports = function (program, workingPath, connectionInfo, currentConfig, ticket, cb) {
   if (currentConfig.LAST_SENT_THUMBPRINT          === getCurrentThumbprint(workingPath) && 
       urlJoin(currentConfig.SERVER_URL, '/wsfed') === connectionInfo.signInEndpoint ) return cb();
 
@@ -31,7 +31,7 @@ module.exports = function (program, workingPath, connectionInfo, currentConfig, 
 
 
   request.post({
-    url: urlJoin(auth0Url, '/p/', ticket),
+    url: ticket,
     json: {
       certs:          [cert],
       signInEndpoint: signInEndpoint
