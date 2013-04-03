@@ -1,3 +1,5 @@
+require('colors');
+
 var http     = require('http');
 var express  = require('express');
 var passport = require('passport');

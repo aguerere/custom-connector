@@ -34,13 +34,14 @@ var respondWsFederation = wsfed.auth({
 exports.install = function (app) {
   app.get('/wsfed', 
     function (req, res, next) {
-      if (req.session.user) {
+      if (req.session.user && req.query.wprompt !== 'consent') {
         req.user = req.session.user;
         return respondWsFederation(req, res);
       }
       next();
     },
     function (req, res) {
+      console.log('rendering login');
       return res.render('login', {
         title: config.SITE_NAME
       });
@@ -53,6 +54,7 @@ exports.install = function (app) {
         session: false
       })(req, res, next);
     }, function (req, res, next) {
+      console.log('user ' + req.user.displayName.green + ' authenticated');
       req.session.user = req.user;
       next();
     }, respondWsFederation);
@@ -64,6 +66,7 @@ exports.install = function (app) {
     }));
 
   app.get('/logout', function (req, res) {
+    console.log('user ' + req.session.user.displayName.green + ' logged out');
     delete req.session;
     res.send('bye');
   });

@@ -27,6 +27,7 @@
     "ejs": "~0.8.3",
     "cookie-sessions": "0.0.2",
     "connector-setup": "git+https://github.com/auth0/connector-setup.git",
-    "wsfed": "~0.3.3"
+    "wsfed": "~0.3.3",
+    "colors": "~0.6.0-1"
   }
 }
