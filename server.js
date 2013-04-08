@@ -1,16 +1,25 @@
 require('colors');
-
-var http     = require('http');
-var express  = require('express');
-var passport = require('passport');
+var nconf = require('nconf');
 var connectorSetup = require('connector-setup');
 
-connectorSetup.run(__dirname, function(err, config) {
+nconf.env('||')
+     .file({ file: __dirname + '/config.json', logicalSeparator: '||' })
+     .defaults({
+        PORT:           4000,
+        SESSION_SECRET: 'a1b2c3d4567',
+        AUTHENTICATION: 'FORM'
+     });
+
+connectorSetup.run(__dirname, function(err) {
 
   if(err) {
     console.log(err.message);
     process.exit(2);
   }
+
+  var http     = require('http');
+  var express  = require('express');
+  var passport = require('passport');
     
   require('./setupPassport');
 
@@ -29,7 +38,7 @@ connectorSetup.run(__dirname, function(err, config) {
     this.use(express.bodyParser());
     this.use(cookieSessions({
       session_key:    'sqlfs',
-      secret:         config.SESSION_SECRET
+      secret:         nconf.get('SESSION_SECRET')
     }));
 
     this.use(passport.initialize());
@@ -39,10 +48,8 @@ connectorSetup.run(__dirname, function(err, config) {
 
   require('./endpoints').install(app);
 
-  var port = process.env.PORT || config.PORT || 4000;
-
   http.createServer(app)
-    .listen(port, function () {
-      console.log('listening on http://localhost:' + port);
+    .listen(nconf.get('PORT'), function () {
+      console.log('listening on http://localhost:' + nconf.get('PORT'));
     });
 });

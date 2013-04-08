@@ -20,13 +20,13 @@
   "author": "Auth0",
   "license": "MIT",
   "dependencies": {
-    "msnodesql": "~0.2.1",
     "express": "~3.1.0",
     "passport": "~0.1.16",
     "passport-local": "~0.1.6",
     "ejs": "~0.8.3",
-    "cookie-sessions": "0.0.2",
-    "connector-setup": "git+https://github.com/auth0/connector-setup.git",
+    "cookie-sessions": "https://github.com/auth0/cookie-sessions/tarball/master",
+    "nconf":           "https://github.com/jfromaniello/nconf/tarball/master",
+    "connector-setup": "https://github.com/auth0/connector-setup/tarball/master",
     "wsfed": "~0.3.3",
     "colors": "~0.6.0-1"
   }

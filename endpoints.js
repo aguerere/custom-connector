@@ -2,10 +2,9 @@ var fs       = require('fs');
 var path     = require('path');
 var passport = require('passport');
 var wsfed    = require('wsfed');
-var config   = require('./config.json');
+var nconf    = require('nconf');
 
-
-var issuer = config.WSFED_ISSUER;
+var issuer   = nconf.get('WSFED_ISSUER');
 
 var credentials = {
   cert: fs.readFileSync(path.join(__dirname, '/certs/cert.pem')),
@@ -17,13 +16,13 @@ var respondWsFederation = wsfed.auth({
   cert:        credentials.cert,
   key:         credentials.key,
   getPostURL:  function (wtrealm, wreply, req, callback) {
-    var realmPostURLs = config['REALMS'][wtrealm];
+    var realmPostURLs = nconf.get(wtrealm);
     if (realmPostURLs) {
       realmPostURLs = realmPostURLs.split(',');
       if (wreply && ~realmPostURLs.indexOf(wreply)) {
         return callback(null, wreply);
       }
-      if (!wreply) {
+      if(!wreply){
         return callback(null, realmPostURLs[0]);
       }
     }
@@ -41,9 +40,13 @@ exports.install = function (app) {
       next();
     },
     function (req, res) {
+      var messages = (req.session.messages || []).join('<br />');
+
+      delete req.session.messages;
       console.log('rendering login');
       return res.render('login', {
-        title: config.SITE_NAME
+        title:  nconf.get('SITE_NAME'),
+        errors: messages
       });
     });
 
@@ -51,6 +54,7 @@ exports.install = function (app) {
       //authenticate the user, on success call next middleware
       passport.authenticate('local', { 
         failureRedirect: req.url,
+        failureMessage: "The username or password you entered is incorrect.",
         session: false
       })(req, res, next);
     }, function (req, res, next) {

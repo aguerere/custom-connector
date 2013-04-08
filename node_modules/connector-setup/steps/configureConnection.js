@@ -3,6 +3,7 @@ var request = require('request');
 var fs = require('fs');
 var path = require('path');
 var thumbprint = require('thumbprint');
+var nconf = require('nconf');
 
 var pemToCert = function(pem) {
   var cert = /-----BEGIN CERTIFICATE-----([^-]*)-----END CERTIFICATE-----/g.exec(pem.toString());
@@ -18,11 +19,11 @@ var getCurrentThumbprint = function (workingPath) {
   return thumbprint.calculate(cert);
 };
 
-module.exports = function (program, workingPath, connectionInfo, currentConfig, ticket, cb) {
-  if (currentConfig.LAST_SENT_THUMBPRINT          === getCurrentThumbprint(workingPath) && 
-      urlJoin(currentConfig.SERVER_URL, '/wsfed') === connectionInfo.signInEndpoint ) return cb();
+module.exports = function (program, workingPath, connectionInfo, ticket, cb) {
+  if (nconf.get('LAST_SENT_THUMBPRINT')          === getCurrentThumbprint(workingPath) && 
+      urlJoin(nconf.get('SERVER_URL'), '/wsfed') === connectionInfo.signInEndpoint ) return cb();
 
-  var serverUrl = currentConfig.SERVER_URL || 'http://localhost:4000';
+  var serverUrl = nconf.get('SERVER_URL') || 'http://localhost:4000';
 
   var signInEndpoint = urlJoin(serverUrl, '/wsfed');
   var cert = pemToCert(fs.readFileSync(path.join(workingPath, 'certs', 'cert.pem')).toString());
@@ -40,8 +41,8 @@ module.exports = function (program, workingPath, connectionInfo, currentConfig, 
     if (err) return cb(err);
     if (response.statusCode !== 200) return cb(new Error(body));
     
-    currentConfig.SERVER_URL = serverUrl;
-    currentConfig.LAST_SENT_THUMBPRINT = getCurrentThumbprint(workingPath);
+    nconf.set('SERVER_URL', serverUrl);
+    nconf.set('LAST_SENT_THUMBPRINT', getCurrentThumbprint(workingPath));
 
     console.log(('Connection to ' + connectionInfo.appName + ' configured.').green);
     cb();
