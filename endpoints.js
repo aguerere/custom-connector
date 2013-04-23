@@ -40,27 +40,27 @@ exports.install = function (app) {
       next();
     },
     function (req, res) {
-      var messages = (req.session.messages || []).join('<br />');
-
-      delete req.session.messages;
       console.log('rendering login');
       return res.render('login', {
         title:  nconf.get('SITE_NAME'),
-        errors: messages
+        errors: []
       });
     });
 
   app.post('/wsfed', function (req, res, next) {
       //authenticate the user, on success call next middleware
-      passport.authenticate('local', { 
-        failureRedirect: req.url,
-        failureMessage: "The username or password you entered is incorrect.",
+      passport.authenticate('local', {
         session: false
+      }, function (err, profile) {
+         if (!profile) {
+          return res.render('login', {
+            title:  nconf.get('SITE_NAME'),
+            errors: "The username or password you entered is incorrect."
+          });
+         }
+         req.session.user = (req.user = profile);
+         return next();
       })(req, res, next);
-    }, function (req, res, next) {
-      console.log('user ' + req.user.displayName.green + ' authenticated');
-      req.session.user = req.user;
-      next();
     }, respondWsFederation);
 
   app.get('/wsfed/FederationMetadata/2007-06/FederationMetadata.xml',
