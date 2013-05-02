@@ -70,6 +70,9 @@ exports.install = function (app) {
     }));
 
   app.get('/logout', function (req, res) {
+    
+    if(!req.session.user) return res.send(200);
+    
     console.log('user ' + req.session.user.displayName.green + ' logged out');
     req.logout();
     delete req.session;
