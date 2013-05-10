@@ -17,10 +17,10 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" /> 
 	
 	<!-- Stylesheets -->
-	<link rel="stylesheet" href="css/base.css">
-	<link rel="stylesheet" href="css/skeleton.css">
-	<link rel="stylesheet" href="css/layout.css">
-	<link rel="stylesheet" href="css/zocial.css">
+	<link rel="stylesheet" href="../css/base.css">
+	<link rel="stylesheet" href="../css/skeleton.css">
+	<link rel="stylesheet" href="../css/layout.css">
+	<link rel="stylesheet" href="../css/zocial.css">
 	
 </head>
 <body>
@@ -36,21 +36,16 @@
 	<div class="container">
 		
 		<div class="form-bg">
-			<form method="post">					
-				<h2><%= title %></h2>
-				<p><input name="username" type="text" placeholder="Username" required></p>
-				<p><input name="password" type="password"  placeholder="Password" required></p>
-				<!-- <label for="remember">
-				  <input type="checkbox" id="remember" value="remember" />
-				  <span>Remember me on this computer</span>
-				</label> -->
-				<!-- <button type="submit"></button> -->
-				<button type="submit" class="zocial guest">Login</a>
 			<form>
+			  <fieldset>
+			  	<h2><%= title %></h2>
+			  	<p><input name="password" type="password"  placeholder="Password" required></p>
+			  	<p><input name="password" type="password"  placeholder="Repeat Password" required></p>
+			    <button type="submit" class="zocial guest">Submit</button>
+			  </fieldset>
+			</form>
 		</div>
 
-	
-		<p class="forgot">Forgot your password? <a href="/forgot">Click here to reset it.</a></p>
 		<p class="forgot">Powered by <a href="http://auth0.com">Auth0</a> Sql Server Connector</p>
 
 

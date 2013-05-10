@@ -4,6 +4,8 @@ var passport = require('passport');
 var wsfed    = require('wsfed');
 var nconf    = require('nconf');
 
+var users = require('./users');
+
 var issuer   = nconf.get('WSFED_ISSUER');
 
 var credentials = {
@@ -68,6 +70,32 @@ exports.install = function (app) {
       cert:   credentials.cert,
       issuer: issuer
     }));
+
+  app.get('/forgot/:ticket?', function (req, res) {
+    if (req.params.ticket) {
+      users.getUserByRandomTicket(req.params.ticket, function(err, user){
+        if (err) { return res.send(500); }
+        if(!user) { return res.send(404); }
+        return res.render('ticket', {
+          title:  nconf.get('SITE_NAME'),
+          errors: []
+        });
+      })
+    }
+
+    res.render('forgot', {
+      title:  nconf.get('SITE_NAME'),
+      errors: []
+    });
+  });
+
+  app.post('/forgot', function (req, res) {
+    users.generateRandomTicket(req.body.email, function(err, ticket) {
+      if (err) { return res.send(500); };
+      console.log('send email to ' + req.body.email + ' the ticket ' + ticket);
+      res.redirect('/wsfed');
+    });
+  });
 
   app.get('/logout', function (req, res) {
     
