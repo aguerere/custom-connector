@@ -38,7 +38,8 @@ connectorSetup.run(__dirname, function(err) {
     this.use(express.bodyParser());
     this.use(cookieSessions({
       session_key:    'sqlfs',
-      secret:         nconf.get('SESSION_SECRET')
+      secret:         nconf.get('SESSION_SECRET'),
+      session_cookie: true
     }));
 
     this.use(passport.initialize());
