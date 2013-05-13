@@ -98,8 +98,11 @@ exports.install = function (app) {
       console.log('send email to ' + req.body.email + ' the ticket ' + ticket);
       mailer.send(req.body.email, ticket, function(err) {
         if (err) { return res.send(500, err.message); }
-        // TO-DO: Should back to referer?
-        res.redirect('/wsfed');
+        res.render('forgot', {
+          title:  nconf.get('SITE_NAME'),
+          messages: ['We\'ve just sent you an email to reset your password.'],
+          errors: []
+        });
       })
     });
   });

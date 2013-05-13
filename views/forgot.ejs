@@ -30,6 +30,11 @@
 		</div>
 	<% } %>
 
+	<% if (messages && messages.length > 0) { %>
+		<div class="notice">
+			<p class="success"><%= messages %></p>
+		</div>
+	<% } %>
 
 	<!-- Primary Page Layout -->
 

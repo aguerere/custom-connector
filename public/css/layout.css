@@ -15,7 +15,6 @@
         width: 100%;
         background: #fff;
         border-bottom: 4px solid #eaeff3;
-        color: #e34848;
         position: fixed;
         top: 0;
         font-size: 14px;
@@ -27,6 +26,13 @@
     }
     
     .notice p.warn {
+        color: #e34848;
+        text-align: center;
+        line-height: 45px;
+    }
+
+    .notice p.success {
+        color: #BED4B7;
         text-align: center;
         line-height: 45px;
     }
