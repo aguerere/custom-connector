@@ -80,13 +80,17 @@ exports.install = function (app) {
         return res.render('ticket', {
           title: nconf.get('SITE_NAME'),
           ticket: req.params.ticket,
+          originalUrl: req.query.original_url,
+          messages: [],
           errors: []
         });
       })
     }
 
+    req.session.originalUrl = req.headers['referer'];
     res.render('forgot', {
       title:  nconf.get('SITE_NAME'),
+      messages: [],
       errors: []
     });
   });
@@ -96,7 +100,7 @@ exports.install = function (app) {
       if (err) { return res.send(500); }
 
       console.log('send email to ' + req.body.email + ' the ticket ' + ticket);
-      mailer.send(req.body.email, ticket, function(err) {
+      mailer.send(req.body.email, ticket, encodeURIComponent(req.session.originalUrl), function(err) {
         if (err) { return res.send(500, err.message); }
         res.render('forgot', {
           title:  nconf.get('SITE_NAME'),
@@ -112,8 +116,7 @@ exports.install = function (app) {
       if (err) { return res.send(500); }
       users.update(user.id, { password: req.body.password }, function(err, updatedUser) {
         if (err) { return res.send(500); }
-        // TO-DO: Should back to referer?
-        res.redirect('/wsfed');
+        res.redirect(req.body.originalUrl);
       });
     });
   });
