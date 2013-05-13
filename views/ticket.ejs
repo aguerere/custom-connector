@@ -36,11 +36,11 @@
 	<div class="container">
 		
 		<div class="form-bg">
-			<form method="post" action="/users">
+			<form id="changePassword" method="post" action="/users">
 			  <fieldset>
 			  	<h2><%= title %></h2>
-			  	<p><input name="password" type="password"  placeholder="Password" required></p>
-			  	<p><input name="repeatPassword" type="password"  placeholder="Repeat Password" required></p>
+			  	<p><input name="password" type="password" id="password" placeholder="Password" required></p>
+			  	<p><input name="repeatPassword" type="password" id="repeatPassword" placeholder="Repeat Password" required></p>
 			  	<p><input name="ticket" type="hidden" value="<%= ticket %>"></p>
 			    <button type="submit" class="zocial guest">Submit</button>
 			  </fieldset>
@@ -54,5 +54,18 @@
 
 	
 <!-- End Document -->
+<script type="text/javascript">
+	var form = document.getElementById("changePassword");
+	var repeatPassword = document.getElementById("repeatPassword");
+	 
+  repeatPassword.addEventListener("input", function() {
+  	var e = form.elements;
+    if (e['password'].value != repeatPassword.value) {
+        repeatPassword.setCustomValidity("Please enter the same password");
+    } else {
+        repeatPassword.setCustomValidity("");
+    }
+  });
+</script>
 </body>
 </html>
