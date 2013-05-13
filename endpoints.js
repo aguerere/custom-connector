@@ -78,7 +78,8 @@ exports.install = function (app) {
         if (err) { return res.send(500); }
         if(!user) { return res.send(404); }
         return res.render('ticket', {
-          title:  nconf.get('SITE_NAME'),
+          title: nconf.get('SITE_NAME'),
+          ticket: req.params.ticket,
           errors: []
         });
       })
@@ -103,13 +104,16 @@ exports.install = function (app) {
     });
   });
 
-  // TO-DO: Should update password in DB?
-  // app.put('/users', function (req, res) {
-  //   users.update(req.user.id, { password: req.body.password }, function(err, user) {
-  //     if (err) { return res.send(500); };
-  //     res.redirect('/wsfed');
-  //   });
-  // });
+  app.post('/users', function (req, res) {
+    users.getUserByRandomTicket(req.body.ticket, function(err, user) {
+      if (err) { return res.send(500); }
+      users.update(user.id, { password: req.body.password }, function(err, updatedUser) {
+        if (err) { return res.send(500); }
+        // TO-DO: Should back to referer?
+        res.redirect('/wsfed');
+      });
+    });
+  });
 
   app.get('/logout', function (req, res) {
     

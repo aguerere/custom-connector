@@ -3,7 +3,7 @@ var env = require("./env");
 
 // create reusable transport method (opens pool of SMTP connections)
 var smtpTransport = nodemailer.createTransport("SMTP",{
-    service: env['EMAIL_SERVICE'],
+    service: env['EMAIL_SERVICE'] || 'Gmail',
     auth: {
         user: env['EMAIL_SERVICE'],
         pass: env['EMAIL_PASSWORD']

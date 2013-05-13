@@ -36,11 +36,12 @@
 	<div class="container">
 		
 		<div class="form-bg">
-			<form>
+			<form method="post" action="/users">
 			  <fieldset>
 			  	<h2><%= title %></h2>
 			  	<p><input name="password" type="password"  placeholder="Password" required></p>
-			  	<p><input name="password" type="password"  placeholder="Repeat Password" required></p>
+			  	<p><input name="repeatPassword" type="password"  placeholder="Repeat Password" required></p>
+			  	<p><input name="ticket" type="hidden" value="<%= ticket %>"></p>
 			    <button type="submit" class="zocial guest">Submit</button>
 			  </fieldset>
 			</form>

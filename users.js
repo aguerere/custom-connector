@@ -8,7 +8,7 @@ var users = [
       familyName: 'user',
       givenName:  'test'
     }, 
-    emails:   [ { value: 'ezequiel.morito@hotmail.com'} ]
+    emails:   [ { value: 'foo@bar.com' } ]
   }
 ];
 
@@ -42,6 +42,16 @@ exports.getUserByRandomTicket = function (ticket, callback) {
   var user = users.filter(function (user) { 
     return user.ticket === ticket;
   })[0];
+  
+  return callback(null, user);
+};
+
+exports.update = function (id, updatedUser, callback) {
+  var user = users.filter(function (user) { 
+    return user.id === id;
+  })[0];
+
+  user.password = updatedUser.password;
   
   return callback(null, user);
 };
