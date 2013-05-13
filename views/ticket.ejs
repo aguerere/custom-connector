@@ -1,71 +1,14 @@
-<!doctype html>
-<!--[if lt IE 7 ]><html class="ie ie6" lang="en"> <![endif]-->
-<!--[if IE 7 ]><html class="ie ie7" lang="en"> <![endif]-->
-<!--[if IE 8 ]><html class="ie ie8" lang="en"> <![endif]-->
-<!--[if (gte IE 9)|!(IE)]><!--> 	<html lang="en"> <!--<![endif]-->
-<head>
-
-	<!-- General Metas -->
-	<meta charset="utf-8" />
-	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">	<!-- Force Latest IE rendering engine -->
-	<title><%= title %></title>
-	<!--[if lt IE 9]>
-		<script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
-	<![endif]-->
-	
-	<!-- Mobile Specific Metas -->
-	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" /> 
-	
-	<!-- Stylesheets -->
-	<link rel="stylesheet" href="../css/base.css">
-	<link rel="stylesheet" href="../css/skeleton.css">
-	<link rel="stylesheet" href="../css/layout.css">
-	<link rel="stylesheet" href="../css/zocial.css">
-	
-</head>
-<body>
-	<% if (errors && errors.length > 0) { %>
-		<div class="notice">
-			<p class="warn"><%= errors %></p>
-		</div>
-	<% } %>
-
-	<!-- Primary Page Layout -->
-
-	<div class="container">
-		
-		<div class="form-bg">
-			<form id="changePassword" method="post" action="/users">
-			  <fieldset>
-			  	<h2><%= title %></h2>
-			  	<p><input name="password" type="password" id="password" placeholder="Password" required></p>
-			  	<p><input name="repeatPassword" type="password" id="repeatPassword" placeholder="Repeat Password" required></p>
-			  	<p><input name="ticket" type="hidden" value="<%= ticket %>"></p>
-			  	<p><input name="originalUrl" type="hidden" value="<%= originalUrl %>"></p>
-			    <button type="submit" class="zocial guest">Submit</button>
-			  </fieldset>
-			</form>
-		</div>
-
-		<p class="forgot">Powered by <a href="http://auth0.com">Auth0</a> Sql Server Connector</p>
-
-
-	</div><!-- container -->
-
-	
-<!-- End Document -->
-<script type="text/javascript">
-	var form = document.getElementById("changePassword");
-	var repeatPassword = document.getElementById("repeatPassword");
-	 
-  repeatPassword.addEventListener("input", function() {
-  	var e = form.elements;
-    if (e['password'].value != repeatPassword.value) {
-        repeatPassword.setCustomValidity("Please enter the same password");
-    } else {
-        repeatPassword.setCustomValidity("");
-    }
-  });
-</script>
-</body>
-</html>
+<% include header %>
+<div class="form-bg">
+	<form id="changePassword" method="post" action="/users">
+	  <fieldset>
+	  	<h2><%= title %></h2>
+	  	<p><input name="password" type="password" id="password" placeholder="Password" required></p>
+	  	<p><input name="repeatPassword" type="password" id="repeatPassword" placeholder="Repeat Password" required></p>
+	  	<p><input name="ticket" type="hidden" value="<%= ticket %>"></p>
+	  	<p><input name="originalUrl" type="hidden" value="<%= originalUrl %>"></p>
+	    <button type="submit" class="zocial guest">Submit</button>
+	  </fieldset>
+	</form>
+</div>
+<% include footer %>

@@ -46,6 +46,7 @@ exports.install = function (app) {
       console.log('rendering login');
       return res.render('login', {
         title:  nconf.get('SITE_NAME'),
+        messages: [],
         errors: []
       });
     });
@@ -58,6 +59,7 @@ exports.install = function (app) {
          if (!profile) {
           return res.render('login', {
             title:  nconf.get('SITE_NAME'),
+            messages: [],
             errors: "The username or password you entered is incorrect."
           });
          }
