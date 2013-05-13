@@ -2,12 +2,13 @@ var users = [
   {
     id:           123,
     username:     'test', 
+    password:     '123', 
     displayName:  'test user',
     name: {
       familyName: 'user',
       givenName:  'test'
     }, 
-    emails:   [ { value: 'foo@bar.com'} ]
+    emails:   [ { value: 'ezequiel.morito@hotmail.com'} ]
   }
 ];
 
@@ -16,7 +17,7 @@ exports.getProfile = function (name, password, callback) {
     return user.username === name;
   })[0];
 
-  if (password !== '123') return callback();
+  if (password !== user.password) return callback();
   
   return callback(null, user);
 };

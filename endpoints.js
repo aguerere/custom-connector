@@ -5,6 +5,7 @@ var wsfed    = require('wsfed');
 var nconf    = require('nconf');
 
 var users = require('./users');
+var mailer = require('./mailer');
 
 var issuer   = nconf.get('WSFED_ISSUER');
 
@@ -91,11 +92,24 @@ exports.install = function (app) {
 
   app.post('/forgot', function (req, res) {
     users.generateRandomTicket(req.body.email, function(err, ticket) {
-      if (err) { return res.send(500); };
+      if (err) { return res.send(500); }
+
       console.log('send email to ' + req.body.email + ' the ticket ' + ticket);
-      res.redirect('/wsfed');
+      mailer.send(req.body.email, ticket, function(err) {
+        if (err) { return res.send(500, err.message); }
+        // TO-DO: Should back to referer?
+        res.redirect('/wsfed');
+      })
     });
   });
+
+  // TO-DO: Should update password in DB?
+  // app.put('/users', function (req, res) {
+  //   users.update(req.user.id, { password: req.body.password }, function(err, user) {
+  //     if (err) { return res.send(500); };
+  //     res.redirect('/wsfed');
+  //   });
+  // });
 
   app.get('/logout', function (req, res) {
     
