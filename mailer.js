@@ -12,13 +12,20 @@ var smtpTransport = nodemailer.createTransport("SMTP",{
 });
 
 // send mail with defined transport object
-exports.send = function(email, ticket, originalUrl, callback) {
+exports.send = function(email, ticket, originalUrl, type, callback) {
     if (!email) return callback(new Error("missing email"));
+    var subject = 'Reset Password';
+    var template = templates.forgotpassword({ ticket: ticket, baseUrl: env['BASE_URL'], originalUrl: originalUrl } );
+
+    if (type === 'activate') {
+        subject = 'Activate Account';
+        template = templates.activateuser({ ticket: ticket, baseUrl: env['BASE_URL'], originalUrl: originalUrl } );
+    };
 
     var mailOptions = { 
         from: env['EMAIL_FROM'],
-        subject: "Change Password",
-        html: templates.forgotpassword({ ticket: ticket, baseUrl: env['BASE_URL'], originalUrl: originalUrl } ),
+        subject: subject,
+        html: template,
         to: email
     }
 

@@ -56,6 +56,7 @@ exports.install = function (app) {
       passport.authenticate('local', {
         session: false
       }, function (err, profile) {
+         if (err) return res.send(500, err);
          if (!profile) {
           return res.render('login', {
             title:  nconf.get('SITE_NAME'),
@@ -123,12 +124,28 @@ exports.install = function (app) {
     });
   });
 
-  app.get('/signup', function (req, res) {
+  app.get('/signup/:ticket?', function (req, res) {
+    if (req.params.ticket) {
+      users.getUserByRandomTicket(req.params.ticket, function(err, user) {
+        if (err) { return res.send(500); }
+        user.update(user.id, { active: true }, function(err, user) {
+          res.redirect(req.query.originalUrl);
+        });
+      });
+    }
+
     req.session.originalUrl = req.headers['referer'];
     res.render('signup', {
       title:  nconf.get('SITE_NAME'),
       messages: [],
       errors: []
+    });
+  });
+
+  app.post('/signup', function (req, res) {
+    users.create(req.body, function(err, user) {
+      if (err) { return res.send(500); }
+      res.redirect(req.session.originalUrl);
     });
   });
 

@@ -1,3 +1,5 @@
+var utils = require('./utils');
+
 var users = [
   {
     id:           123,
@@ -8,14 +10,37 @@ var users = [
       familyName: 'user',
       givenName:  'test'
     }, 
-    emails:   [ { value: 'foo@bar.com' } ]
+    emails:   [ { value: 'foo@bar.com' } ],
+    active:       true
   }
 ];
 
+exports.create = function (user, callback) {
+  var user = {
+    id:           utils.uid(16),
+    username:     user.username, 
+    password:     user.password, 
+    displayName:  user.display_name,
+    name: {
+      familyName: user.last_name,
+      givenName:  user.first_name
+    }, 
+    emails:   [ { value: user.email } ],
+    active:       false,
+    ticket:       utils.uid(16), 
+  }
+
+  users.push(user);
+  
+  return callback(null, user);
+};
+
 exports.getProfile = function (name, password, callback) {
   var user = users.filter(function (user) { 
-    return user.username === name;
+    return user.username === name && user.active;
   })[0];
+
+  if (!user) return callback('User not found');
 
   if (password !== user.password) return callback();
   
@@ -29,11 +54,7 @@ exports.generateRandomTicket = function (email, callback) {
     })[0];
   })[0];
 
-  var validChars = "1234567890abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
-  user.ticket = "";
-  for (var i = 0; i < 16; i++){
-    user.ticket += validChars[Math.floor(Math.random()*validChars.length)];
-  }
+  user.ticket = utils.uid(16);
   
   return callback(null, user.ticket);
 };
