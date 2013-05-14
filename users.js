@@ -72,7 +72,8 @@ exports.update = function (id, updatedUser, callback) {
     return user.id === id;
   })[0];
 
-  user.password = updatedUser.password;
+  if (updatedUser.password) user.password = updatedUser.password;
+  if (updatedUser.active) user.active = updatedUser.active;  
   
   return callback(null, user);
 };

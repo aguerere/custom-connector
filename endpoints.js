@@ -103,7 +103,7 @@ exports.install = function (app) {
       if (err) { return res.send(500); }
 
       console.log('send email to ' + req.body.email + ' the ticket ' + ticket);
-      mailer.send(req.body.email, ticket, encodeURIComponent(req.session.originalUrl), function(err) {
+      mailer.send(req.body.email, ticket, encodeURIComponent(req.session.originalUrl), 'invite', function(err) {
         if (err) { return res.send(500, err.message); }
         res.render('forgot', {
           title:  nconf.get('SITE_NAME'),
@@ -128,8 +128,8 @@ exports.install = function (app) {
     if (req.params.ticket) {
       users.getUserByRandomTicket(req.params.ticket, function(err, user) {
         if (err) { return res.send(500); }
-        user.update(user.id, { active: true }, function(err, user) {
-          res.redirect(req.query.originalUrl);
+        users.update(user.id, { active: true }, function(err, user) {
+          res.redirect(req.query.original_url);
         });
       });
     }
@@ -145,7 +145,9 @@ exports.install = function (app) {
   app.post('/signup', function (req, res) {
     users.create(req.body, function(err, user) {
       if (err) { return res.send(500); }
-      res.redirect(req.session.originalUrl);
+      mailer.send(user.emails[0].value, user.ticket, encodeURIComponent(req.session.originalUrl), 'activate', function(err) {
+        res.redirect(req.session.originalUrl);
+      });
     });
   });
 
