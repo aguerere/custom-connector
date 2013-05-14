@@ -1,0 +1,14 @@
+<% include header %>
+<div class="form-bg">
+	<form id="changePassword" method="post" action="/users">
+	  <fieldset>
+	  	<h2><%= title %></h2>
+	  	<p><input name="password" type="password" id="password" placeholder="Password" required></p>
+	  	<p><input name="repeatPassword" type="password" id="repeatPassword" placeholder="Repeat Password" required></p>
+	  	<p><input name="ticket" type="hidden" value="<%= ticket %>"></p>
+	  	<p><input name="originalUrl" type="hidden" value="<%= originalUrl %>"></p>
+	    <button type="submit" class="zocial guest">Submit</button>
+	  </fieldset>
+	</form>
+</div>
+<% include footer %>

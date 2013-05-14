@@ -1,0 +1,18 @@
+			<p class="forgot">Powered by <a href="http://auth0.com">Auth0</a> Sql Server Connector</p>
+		</div><!-- container -->
+
+		<script type="text/javascript">
+			var form = document.getElementById("changePassword");
+			var repeatPassword = document.getElementById("repeatPassword");
+			 
+		  repeatPassword.addEventListener("input", function() {
+		  	var e = form.elements;
+		    if (e['password'].value != repeatPassword.value) {
+		        repeatPassword.setCustomValidity("Please enter the same password");
+		    } else {
+		        repeatPassword.setCustomValidity("");
+		    }
+		  });
+		</script>
+	</body>
+</html>
