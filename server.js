@@ -25,8 +25,7 @@ connectorSetup.run(__dirname, function(err) {
 
   var cookieSessions = require('cookie-sessions');
   var app = express();
-
-
+  
   //configure the webserver
   app.configure(function(){
     this.set('view engine', 'ejs');
@@ -45,7 +44,6 @@ connectorSetup.run(__dirname, function(err) {
     this.use(passport.initialize());
     this.use(this.router);
   });
-
 
   require('./endpoints').install(app);
 

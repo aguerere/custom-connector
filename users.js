@@ -72,6 +72,16 @@ exports.getUserByRandomTicket = function (ticket, callback) {
   return callback(null, user);
 };
 
+exports.getUserByEmail = function (email, callback) {
+  var user = users.filter(function (user) { 
+    return user.emails.filter(function (user_email) {
+      return user_email.value == email
+    })[0];
+  })[0];
+  
+  return callback(null, user);
+};
+
 exports.update = function (id, updatedUser, callback) {
   var user = users.filter(function (user) { 
     return user.id === id;

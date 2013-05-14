@@ -3,11 +3,14 @@ var path     = require('path');
 var passport = require('passport');
 var wsfed    = require('wsfed');
 var nconf    = require('nconf');
+var hawk     = require('hawk');
 
-var users = require('./users');
+var env    = require("./env");
+var users  = require('./users');
 var mailer = require('./mailer');
+var utils  = require('./utils');
 
-var issuer   = nconf.get('WSFED_ISSUER');
+var issuer = nconf.get('WSFED_ISSUER');
 
 var credentials = {
   cert: fs.readFileSync(path.join(__dirname, '/certs/cert.pem')),
@@ -75,21 +78,7 @@ exports.install = function (app) {
       issuer: issuer
     }));
 
-  app.get('/forgot/:ticket?', function (req, res) {
-    if (req.params.ticket) {
-      users.getUserByRandomTicket(req.params.ticket, function(err, user){
-        if (err) { return res.send(500); }
-        if(!user) { return res.send(404); }
-        return res.render('ticket', {
-          title: nconf.get('SITE_NAME'),
-          ticket: req.params.ticket,
-          originalUrl: req.query.original_url,
-          messages: [],
-          errors: []
-        });
-      })
-    }
-
+  app.get('/forgot', function (req, res) {
     req.session.originalUrl = req.headers['referer'];
     res.render('forgot', {
       title:  nconf.get('SITE_NAME'),
@@ -98,29 +87,48 @@ exports.install = function (app) {
     });
   });
 
-  app.post('/forgot', function (req, res) {
-    users.generateRandomTicket(req.body.email, function(err, ticket) {
-      if (err) { return res.send(500); }
+  app.get('/reset', function (req, res) {
+    var credentialsFunc = function (id, callback) {
+      var bewit_credentials = {
+          key: credentials.key,
+          algorithm: 'sha256'
+      };
 
-      console.log('send email to ' + req.body.email + ' the ticket ' + ticket);
-      mailer.send(req.body.email, ticket, encodeURIComponent(req.session.originalUrl), 'invite', function(err) {
-        if (err) { return res.send(500, err.message); }
-        res.render('forgot', {
-          title:  nconf.get('SITE_NAME'),
-          messages: ['We\'ve just sent you an email to reset your password.'],
-          errors: []
-        });
-      })
+      return callback(null, bewit_credentials);
+    };
+
+    hawk.uri.authenticate(req, credentialsFunc, {}, function (err, bewit_credentials, attributes) {
+      if (err) { return res.send(401); }
+      return res.render('reset', {
+        title: nconf.get('SITE_NAME'),
+        email: req.query.email,
+        original_url: req.query.original_url,
+        messages: [],
+        errors: []
+      });
+    });
+  });
+
+  app.post('/forgot', function (req, res) {
+    console.log('send email to ' + req.body.email);
+    var uri = utils.uri(req.body.email, env['BASE_URL'], encodeURIComponent(req.session.originalUrl), credentials.key);
+    mailer.send(req.body.email, null, uri, 'invite', function(err) {
+      if (err) { return res.send(500, err.message); }
+      res.render('forgot', {
+        title:  nconf.get('SITE_NAME'),
+        messages: ['We\'ve just sent you an email to reset your password.'],
+        errors: []
+      });
     });
   });
 
   app.post('/users', function (req, res) {
-    users.getUserByRandomTicket(req.body.ticket, function(err, user) {
+    users.getUserByEmail(req.body.email, function(err, user) {
       if (err) { return res.send(500); }
       if(!user) { return res.send(404); }
       users.update(user.id, { password: req.body.password }, function(err, updatedUser) {
         if (err) { return res.send(500); }
-        res.redirect(req.body.originalUrl);
+        res.redirect(req.body.original_url);
       });
     });
   });
