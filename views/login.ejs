@@ -1,10 +1,12 @@
 <% include header %>
 <div class="form-bg">
 	<form method="post">
-		<h2><%= title %></h2>
-		<p><input name="username" type="text" placeholder="Username" required></p>
-		<p><input name="password" type="password"  placeholder="Password" required></p>	
-		<button type="submit" class="zocial guest">Login</a>
+		<fieldset>
+			<h2><%= title %></h2>
+			<p><input name="username" type="text" placeholder="Username" required></p>
+			<p><input name="password" type="password"  placeholder="Password" required></p>	
+			<button type="submit" class="zocial guest">Login</a>
+		</fieldset>
 	</form>
 </div>
 <p class="forgot"><a href="/forgot">Forgot your password.</a></p>

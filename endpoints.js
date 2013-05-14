@@ -123,6 +123,15 @@ exports.install = function (app) {
     });
   });
 
+  app.get('/signup', function (req, res) {
+    req.session.originalUrl = req.headers['referer'];
+    res.render('signup', {
+      title:  nconf.get('SITE_NAME'),
+      messages: [],
+      errors: []
+    });
+  });
+
   app.get('/logout', function (req, res) {
     
     if(!req.session.user) return res.send(200);

@@ -53,7 +53,6 @@
     
     .form-bg {
         width: 370px;
-        height: 248px;
         -moz-border-radius:9px;
         -webkit-border-radius:9px;
         border-radius:9px;
@@ -63,8 +62,6 @@
         }
     
     .form-bg form {
-        width: 360px;
-        height: 239px;
         background: #fff url(../images/bg_form.jpg) repeat-x top left;      
         -moz-border-radius:4px;
         -webkit-border-radius:4px;
