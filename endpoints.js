@@ -117,6 +117,7 @@ exports.install = function (app) {
   app.post('/users', function (req, res) {
     users.getUserByRandomTicket(req.body.ticket, function(err, user) {
       if (err) { return res.send(500); }
+      if(!user) { return res.send(404); }
       users.update(user.id, { password: req.body.password }, function(err, updatedUser) {
         if (err) { return res.send(500); }
         res.redirect(req.body.originalUrl);
@@ -128,6 +129,7 @@ exports.install = function (app) {
     if (req.params.ticket) {
       users.getUserByRandomTicket(req.params.ticket, function(err, user) {
         if (err) { return res.send(500); }
+        if(!user) { return res.send(404); }
         users.update(user.id, { active: true }, function(err, user) {
           res.redirect(req.query.original_url);
         });
@@ -144,7 +146,7 @@ exports.install = function (app) {
 
   app.post('/signup', function (req, res) {
     users.create(req.body, function(err, user) {
-      if (err) { return res.send(500); }
+      if (err) { return res.send(500, err); }
       mailer.send(user.emails[0].value, user.ticket, encodeURIComponent(req.session.originalUrl), 'activate', function(err) {
         res.redirect(req.session.originalUrl);
       });

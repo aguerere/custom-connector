@@ -16,7 +16,12 @@ var users = [
 ];
 
 exports.create = function (user, callback) {
-  var user = {
+  users.filter(function (existing_user) { 
+    if (existing_user.username === user.username)
+      return callback('User exists');
+  });
+
+  var new_user = {
     id:           utils.uid(16),
     username:     user.username, 
     password:     user.password, 
@@ -30,9 +35,9 @@ exports.create = function (user, callback) {
     ticket:       utils.uid(16), 
   }
 
-  users.push(user);
+  users.push(new_user);
   
-  return callback(null, user);
+  return callback(null, new_user);
 };
 
 exports.getProfile = function (name, password, callback) {
