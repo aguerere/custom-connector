@@ -16,10 +16,12 @@ var users = [
 ];
 
 exports.create = function (user, callback) {
-  users.filter(function (existing_user) { 
-    if (existing_user.username === user.username)
-      return callback('User exists');
-  });
+  var exists_user = users.filter(function (existing_user) { 
+    return existing_user.username === user.username || existing_user.emails.filter(function(email) { return email.value == user.email })[0];
+  })[0];
+
+  if (exists_user)
+    return callback('User Exists');
 
   var new_user = {
     id:           utils.uid(16),
