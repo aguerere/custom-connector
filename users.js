@@ -33,8 +33,7 @@ exports.create = function (user, callback) {
       givenName:  user.first_name
     }, 
     emails:   [ { value: user.email } ],
-    active:       false,
-    ticket:       utils.uid(16), 
+    active:       false
   }
 
   users.push(new_user);
@@ -50,26 +49,6 @@ exports.getProfile = function (name, password, callback) {
   if (!user) return callback('User not found');
 
   if (password !== user.password) return callback();
-  
-  return callback(null, user);
-};
-
-exports.generateRandomTicket = function (email, callback) {
-  var user = users.filter(function (user) { 
-    return user.emails.filter(function (userEmail) {
-      return userEmail.value == email
-    })[0];
-  })[0];
-
-  user.ticket = utils.uid(16);
-  
-  return callback(null, user.ticket);
-};
-
-exports.getUserByRandomTicket = function (ticket, callback) {
-  var user = users.filter(function (user) { 
-    return user.ticket === ticket;
-  })[0];
   
   return callback(null, user);
 };

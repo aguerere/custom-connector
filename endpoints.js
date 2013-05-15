@@ -36,6 +36,15 @@ var respondWsFederation = wsfed.auth({
   }
 });
 
+var credentialsFunc = function (id, callback) {
+  var bewit_credentials = {
+    key: credentials.key,
+    algorithm: 'sha256'
+  };
+
+  return callback(null, bewit_credentials);
+};
+
 exports.install = function (app) {
   app.get('/wsfed', 
     function (req, res, next) {
@@ -79,7 +88,7 @@ exports.install = function (app) {
     }));
 
   app.get('/forgot', function (req, res) {
-    req.session.originalUrl = req.headers['referer'];
+    req.session.original_url = req.headers['referer'];
     res.render('forgot', {
       title:  nconf.get('SITE_NAME'),
       messages: [],
@@ -87,16 +96,19 @@ exports.install = function (app) {
     });
   });
 
+  app.post('/forgot', function (req, res) {
+    console.log('send email to ' + req.body.email);
+    mailer.send(req.body.email, credentials.key, encodeURIComponent(req.session.original_url), 'invite', function(err) {
+      if (err) { return res.send(500, err.message); }
+      res.render('forgot', {
+        title:  nconf.get('SITE_NAME'),
+        messages: ['We\'ve just sent you an email to reset your password.'],
+        errors: []
+      });
+    });
+  });
+
   app.get('/reset', function (req, res) {
-    var credentialsFunc = function (id, callback) {
-      var bewit_credentials = {
-          key: credentials.key,
-          algorithm: 'sha256'
-      };
-
-      return callback(null, bewit_credentials);
-    };
-
     hawk.uri.authenticate(req, credentialsFunc, {}, function (err, bewit_credentials, attributes) {
       if (err) { return res.send(401); }
       return res.render('reset', {
@@ -109,20 +121,7 @@ exports.install = function (app) {
     });
   });
 
-  app.post('/forgot', function (req, res) {
-    console.log('send email to ' + req.body.email);
-    var uri = utils.uri(req.body.email, env['BASE_URL'], encodeURIComponent(req.session.originalUrl), credentials.key);
-    mailer.send(req.body.email, null, uri, 'invite', function(err) {
-      if (err) { return res.send(500, err.message); }
-      res.render('forgot', {
-        title:  nconf.get('SITE_NAME'),
-        messages: ['We\'ve just sent you an email to reset your password.'],
-        errors: []
-      });
-    });
-  });
-
-  app.post('/users', function (req, res) {
+  app.post('/reset', function (req, res) {
     users.getUserByEmail(req.body.email, function(err, user) {
       if (err) { return res.send(500); }
       if(!user) { return res.send(404); }
@@ -133,18 +132,8 @@ exports.install = function (app) {
     });
   });
 
-  app.get('/signup/:ticket?', function (req, res) {
-    if (req.params.ticket) {
-      users.getUserByRandomTicket(req.params.ticket, function(err, user) {
-        if (err) { return res.send(500); }
-        if(!user) { return res.send(404); }
-        users.update(user.id, { active: true }, function(err, user) {
-          res.redirect(req.query.original_url);
-        });
-      });
-    }
-
-    req.session.originalUrl = req.headers['referer'];
+  app.get('/signup', function (req, res) {
+    req.session.original_url = req.headers['referer'];
     res.render('signup', {
       title:  nconf.get('SITE_NAME'),
       messages: [],
@@ -155,14 +144,26 @@ exports.install = function (app) {
   app.post('/signup', function (req, res) {
     users.create(req.body, function(err, user) {
       if (err) { return res.send(500, err); }
-      mailer.send(user.emails[0].value, user.ticket, encodeURIComponent(req.session.originalUrl), 'activate', function(err) {
-        res.redirect(req.session.originalUrl);
+      mailer.send(user.emails[0].value, credentials.key, encodeURIComponent(req.session.original_url), 'activate', function(err) {
+        res.redirect(req.session.original_url);
+      });
+    });
+  });
+
+  app.get('/activate', function(req, res) {
+    hawk.uri.authenticate(req, credentialsFunc, {}, function (err, bewit_credentials, attributes) {
+      if (err) { return res.send(401); }
+      users.getUserByEmail(req.query.email, function(err, user) {
+        if (err) { return res.send(500); }
+        if(!user) { return res.send(404); }
+        users.update(user.id, { active: true }, function(err, user) {
+          res.redirect(req.query.original_url);
+        });
       });
     });
   });
 
   app.get('/logout', function (req, res) {
-    
     if(!req.session.user) return res.send(200);
     
     console.log('user ' + req.session.user.displayName.green + ' logged out');

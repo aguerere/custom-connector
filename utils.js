@@ -10,17 +10,23 @@ utils.uid = function(length) {
   return id;
 };
 
-utils.uri = function(email, base_url, original_url, key) {
+utils.uri = function(email, base_url, original_url, key, type) {
 	var credentials = {
-	    id: this.uid(16),
-	    key: key,
-	    algorithm: 'sha256'
+    id: this.uid(16),
+    key: key,
+    algorithm: 'sha256'
 	}
 
 	// Generate bewit
-	var duration = 60 * 5; // 5 Minutes
-	var bewit = hawk.uri.getBewit(base_url + '/reset?email='+ email +'&original_url=' + original_url, { credentials: credentials, ttlSec: duration });
-	var uri = base_url + '/reset?email='+ email +'&original_url='+ original_url +'&bewit=' + bewit;
+	var duration = 60 * 5;
+	var temp_uri = base_url + '/reset?email='+ email +'&original_url=' + original_url;
+
+	if (type === 'activate') {
+		temp_uri = base_url + '/activate?email='+ email +'&original_url=' + original_url;
+	};
+
+	var bewit = hawk.uri.getBewit(temp_uri, { credentials: credentials, ttlSec: duration });
+	var uri = temp_uri +'&bewit=' + bewit;
 
 	return uri;
 };
