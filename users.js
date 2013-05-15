@@ -3,21 +3,21 @@ var utils = require('./utils');
 var users = [
   {
     id:           123,
-    username:     'test', 
+    email:        'foo@bar.com',
     password:     '123', 
     displayName:  'test user',
     name: {
       familyName: 'user',
       givenName:  'test'
     }, 
-    emails:   [ { value: 'foo@bar.com' } ],
+    emails:       [ { value: 'foo@bar.com' } ],
     active:       true
   }
 ];
 
 exports.create = function (user, callback) {
   var exists_user = users.filter(function (existing_user) { 
-    return existing_user.username === user.username || existing_user.emails.filter(function(email) { return email.value == user.email })[0];
+    return existing_user.email === user.email;
   })[0];
 
   if (exists_user)
@@ -25,14 +25,14 @@ exports.create = function (user, callback) {
 
   var new_user = {
     id:           utils.uid(16),
-    username:     user.username, 
     password:     user.password, 
-    displayName:  user.display_name,
+    email:        user.email, 
+    displayName:  '',
     name: {
-      familyName: user.last_name,
-      givenName:  user.first_name
+      familyName: '',
+      givenName:  ''
     }, 
-    emails:   [ { value: user.email } ],
+    emails:       [ { value: user.email } ],
     active:       false
   }
 
@@ -41,12 +41,12 @@ exports.create = function (user, callback) {
   return callback(null, new_user);
 };
 
-exports.getProfile = function (name, password, callback) {
+exports.getProfile = function (email, password, callback) {
   var user = users.filter(function (user) { 
-    return user.username === name && user.active;
+    return user.email === email && user.active;
   })[0];
 
-  if (!user) return callback('User not found');
+  if (!user) return callback(null, null);
 
   if (password !== user.password) return callback();
   
@@ -55,9 +55,7 @@ exports.getProfile = function (name, password, callback) {
 
 exports.getUserByEmail = function (email, callback) {
   var user = users.filter(function (user) { 
-    return user.emails.filter(function (user_email) {
-      return user_email.value == email
-    })[0];
+    return user.email === email;
   })[0];
   
   return callback(null, user);

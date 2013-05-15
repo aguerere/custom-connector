@@ -73,7 +73,7 @@ exports.install = function (app) {
           return res.render('login', {
             title:  nconf.get('SITE_NAME'),
             messages: [],
-            errors: "The username or password you entered is incorrect."
+            errors: "The email or password you entered is incorrect."
           });
          }
          req.session.user = (req.user = profile);
@@ -143,9 +143,21 @@ exports.install = function (app) {
 
   app.post('/signup', function (req, res) {
     users.create(req.body, function(err, user) {
-      if (err) { return res.send(500, err); }
-      mailer.send(user.emails[0].value, credentials.key, encodeURIComponent(req.session.original_url), 'activate', function(err) {
-        res.redirect(req.session.original_url);
+      if (err) { 
+        return res.render('signup', {
+          title:  nconf.get('SITE_NAME'),
+          messages: [],
+          errors: [err]
+        });
+      }
+
+      mailer.send(user.email, credentials.key, encodeURIComponent(req.session.original_url), 'activate', function(err) {
+        if (err) { return res.send(500, err.message); }
+        res.render('login', {
+          title:  nconf.get('SITE_NAME'),
+          messages: ['We\'ve just sent you an email to activate your account.'],
+          errors: []
+        });
       });
     });
   });
@@ -169,6 +181,6 @@ exports.install = function (app) {
     console.log('user ' + req.session.user.displayName.green + ' logged out');
     req.logout();
     delete req.session;
-    res.send('bye');
+    return res.send('bye');
   });
 };
