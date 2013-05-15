@@ -97,13 +97,23 @@ exports.install = function (app) {
   });
 
   app.post('/forgot', function (req, res) {
-    console.log('send email to ' + req.body.email);
-    mailer.send(req.body.email, credentials.key, encodeURIComponent(req.session.original_url), 'invite', function(err) {
-      if (err) { return res.send(500, err.message); }
-      res.render('forgot', {
-        title:  nconf.get('SITE_NAME'),
-        messages: ['We\'ve just sent you an email to reset your password.'],
-        errors: []
+    users.getUserByEmail(req.body.email, function(err, user) {
+      if (!user) {
+        return res.render('forgot', {
+          title:  nconf.get('SITE_NAME'),
+          messages: [],
+          errors: ['User does not exist.']
+        });
+      }
+
+      console.log('send email to ' + req.body.email);
+      mailer.send(user.email, credentials.key, encodeURIComponent(req.session.original_url), 'invite', function(err) {
+        if (err) { return res.send(500, err.message); }
+        res.render('forgot', {
+          title:  nconf.get('SITE_NAME'),
+          messages: ['We\'ve just sent you an email to reset your password.'],
+          errors: []
+        });
       });
     });
   });
