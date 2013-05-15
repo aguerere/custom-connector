@@ -4,10 +4,13 @@
 		<fieldset>
 			<h2><%= title %></h2>
 			<p><input name="username" type="email" placeholder="Email" required></p>
-			<p><input name="password" type="password"  placeholder="Password" required></p>	
+			<p class="forgot">
+				<a class="forgot" href="/forgot">Forgot your password?</a>
+				<input name="password" type="password"  placeholder="Password" required>
+			</p>	
 			<button type="submit" class="zocial guest">Sign in</a>
 		</fieldset>
 	</form>
 </div>
-<p class="forgot"><a href="/signup">Sign Up</a>&nbsp;<b>|</b>&nbsp;<a href="/forgot">Forgot your password</a></p>
+<p class="forgot">Don't have an account? <a href="/signup">Sign Up</a></p>
 <% include footer %>

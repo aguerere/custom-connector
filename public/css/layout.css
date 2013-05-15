@@ -171,6 +171,13 @@ height: 32px;
         color: #65c4e5;
     }
 
+    a.forgot {
+        float: right;
+        margin-right: 30px;
+        margin-top: -10px;
+        margin-bottom: 2px;
+    }
+
     
 
 /* #Media Queries
