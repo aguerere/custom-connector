@@ -59,7 +59,8 @@ exports.install = function (app) {
       return res.render('login', {
         title:  nconf.get('SITE_NAME'),
         messages: [],
-        errors: []
+        errors: [],
+        signup: env['ENABLE_SIGNUP']
       });
     });
 
@@ -73,7 +74,8 @@ exports.install = function (app) {
           return res.render('login', {
             title:  nconf.get('SITE_NAME'),
             messages: [],
-            errors: "The email or password you entered is incorrect."
+            errors: "The email or password you entered is incorrect.",
+            signup: env['ENABLE_SIGNUP']
           });
          }
          req.session.user = (req.user = profile);
@@ -143,13 +145,16 @@ exports.install = function (app) {
   });
 
   app.get('/signup', function (req, res) {
-    req.session.original_url = req.headers['referer'];
-    res.render('signup', {
-      title:  nconf.get('SITE_NAME'),
-      messages: [],
-      errors: [],
-      original_url: req.session.original_url
-    });
+    if (env['ENABLE_SIGNUP']) {
+      req.session.original_url = req.headers['referer'];
+      return res.render('signup', {
+        title:  nconf.get('SITE_NAME'),
+        messages: [],
+        errors: [],
+        original_url: req.session.original_url
+      });
+    }
+    res.send(404);
   });
 
   app.post('/signup', function (req, res) {

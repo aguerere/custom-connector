@@ -12,5 +12,7 @@
 		</fieldset>
 	</form>
 </div>
-<p class="forgot">Don't have an account? <a href="/signup">Sign Up</a></p>
+<% if (signup) { %>
+	<p class="forgot">Don't have an account? <a href="/signup">Sign Up</a></p>
+<% } %>
 <% include footer %>
