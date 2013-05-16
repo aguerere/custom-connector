@@ -4,6 +4,7 @@ var passport = require('passport');
 var wsfed    = require('wsfed');
 var nconf    = require('nconf');
 var hawk     = require('hawk');
+var errors   = require('express-errors');
 
 var env    = require("./env");
 var users  = require('./users');
@@ -110,7 +111,7 @@ exports.install = function (app) {
 
       console.log('send email to ' + req.body.email);
       mailer.send(user.email, credentials.key, encodeURIComponent(req.session.original_url), 'invite', function(err) {
-        if (err) { return res.send(500, err.message); }
+        if (err) { res.send(500, err.message) }
         res.render('forgot', {
           title:  nconf.get('SITE_NAME'),
           messages: ['We\'ve just sent you an email to reset your password.'],
@@ -199,4 +200,6 @@ exports.install = function (app) {
     delete req.session;
     return res.send('bye');
   });
+
+  errors.bind(app, { layout: false });
 };
