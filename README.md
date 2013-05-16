@@ -12,7 +12,7 @@ There are some examples in the example folder.
 
 By default the login looks like this:
 
-![](http://content.screencast.com/users/ezequielm/folders/Default/media/df5382d2-43cf-4ddd-881f-4be754d71ffd/signin.png)
+![](http://content.screencast.com/users/ezequielm/folders/Default/media/14c3f8e4-e1c3-4c9f-9f91-d64e46fce7a1/signin.png)
 
 You can change ```views/login.ejs```, ```public/site.css``` and ```public/imgs/logo.png```.
 
@@ -20,7 +20,7 @@ You can change ```views/login.ejs```, ```public/site.css``` and ```public/imgs/l
 
 By default the sign up looks like this:
 
-![](http://content.screencast.com/users/ezequielm/folders/Default/media/f0d79a48-ed95-4441-b861-374edd339163/signup.png)
+![](http://content.screencast.com/users/ezequielm/folders/Default/media/7bcf3eb7-5b3b-4dbe-99da-be9cff5e2940/signup.png)
 
 You can change ```views/signup.ejs```, ```public/site.css``` and ```public/imgs/logo.png```.
 
