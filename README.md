@@ -12,9 +12,21 @@ There are some examples in the example folder.
 
 By default the login looks like this:
 
-![](http://content.screencast.com/users/JoseFR/folders/Jing/media/b059fd26-c5d9-48d1-a717-45f36fba5cf6/00000008.png)
+![](http://content.screencast.com/users/ezequielm/folders/Default/media/14c3f8e4-e1c3-4c9f-9f91-d64e46fce7a1/signin.png)
 
 You can change ```views/login.ejs```, ```public/site.css``` and ```public/imgs/logo.png```.
+
+## Customize the sign up form
+
+By default the sign up looks like this:
+
+![](http://content.screencast.com/users/ezequielm/folders/Default/media/7bcf3eb7-5b3b-4dbe-99da-be9cff5e2940/signup.png)
+
+You can change ```views/signup.ejs```, ```public/site.css``` and ```public/imgs/logo.png```.
+
+If you add required attributes, *e.g. phone_number*, to ```user.js``` you can add it to ```views/signup.ejs```:
+
+	<p><input name="phone_number" type="text" id="phone_number" required ></p>
 
 ## License
 

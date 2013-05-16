@@ -1,3 +1,4 @@
+.DS_Store
 iisnode/*
 config.json
 npm-debug.log

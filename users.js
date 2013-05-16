@@ -1,46 +1,61 @@
+var utils = require('./utils');
+
 var users = [
   {
     id:           123,
-    username:     'test', 
+    email:        'foo@bar.com',
     password:     '123', 
     displayName:  'test user',
     name: {
       familyName: 'user',
       givenName:  'test'
     }, 
-    emails:   [ { value: 'foo@bar.com' } ]
+    emails:       [ { value: 'foo@bar.com' } ],
+    active:       true
   }
 ];
 
-exports.getProfile = function (name, password, callback) {
-  var user = users.filter(function (user) { 
-    return user.username === name;
+exports.create = function (user, callback) {
+  var exists_user = users.filter(function (existing_user) { 
+    return existing_user.email === user.email;
   })[0];
+
+  if (exists_user)
+    return callback('User Exists');
+
+  var new_user = {
+    id:           utils.uid(16),
+    password:     user.password, 
+    email:        user.email, 
+    displayName:  '',
+    name: {
+      familyName: '',
+      givenName:  ''
+    }, 
+    emails:       [ { value: user.email } ],
+    active:       false
+  }
+
+  users.push(new_user);
+  
+  return callback(null, new_user);
+};
+
+exports.getProfile = function (email, password, callback) {
+  var user = users.filter(function (user) { 
+    return user.email === email && user.active;
+  })[0];
+
+  if (!user) return callback(null, null);
 
   if (password !== user.password) return callback();
   
   return callback(null, user);
 };
 
-exports.generateRandomTicket = function (email, callback) {
+exports.getUserByEmail = function (email, callback) {
   var user = users.filter(function (user) { 
-    return user.emails.filter(function (userEmail) {
-      return userEmail.value == email
-    })[0];
-  })[0];
-
-  var validChars = "1234567890abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
-  user.ticket = "";
-  for (var i = 0; i < 16; i++){
-    user.ticket += validChars[Math.floor(Math.random()*validChars.length)];
-  }
-  
-  return callback(null, user.ticket);
-};
-
-exports.getUserByRandomTicket = function (ticket, callback) {
-  var user = users.filter(function (user) { 
-    return user.ticket === ticket;
+    return user.email === email;
   })[0];
   
   return callback(null, user);
@@ -51,7 +66,8 @@ exports.update = function (id, updatedUser, callback) {
     return user.id === id;
   })[0];
 
-  user.password = updatedUser.password;
+  if (updatedUser.password) user.password = updatedUser.password;
+  if (updatedUser.active) user.active = updatedUser.active;  
   
   return callback(null, user);
 };

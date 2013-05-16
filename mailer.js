@@ -1,6 +1,8 @@
 var nodemailer = require("nodemailer");
-var env = require("./env");
-var templates = require('./templates');
+
+var env        = require("./env"), 
+    templates  = require('./templates'),
+    utils      = require('./utils');
 
 // create reusable transport method (opens pool of SMTP connections)
 var smtpTransport = nodemailer.createTransport("SMTP",{
@@ -12,13 +14,22 @@ var smtpTransport = nodemailer.createTransport("SMTP",{
 });
 
 // send mail with defined transport object
-exports.send = function(email, ticket, originalUrl, callback) {
+exports.send = function(email, key, original_url, type, callback) {
     if (!email) return callback(new Error("missing email"));
+    var uri = utils.uri(email, env['BASE_URL'], original_url, key, type);
+
+    var subject = 'Reset Password';
+    var template = templates.forgotpassword({ uri: uri } );
+    
+    if (type === 'activate') {
+        subject = 'Activate Account';
+        template = templates.activateuser({ uri: uri } );
+    };
 
     var mailOptions = { 
         from: env['EMAIL_FROM'],
-        subject: "Change Password",
-        html: templates.forgotpassword({ ticket: ticket, baseUrl: env['BASE_URL'], originalUrl: originalUrl } ),
+        subject: subject,
+        html: template,
         to: email
     }
 
