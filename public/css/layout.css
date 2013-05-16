@@ -178,6 +178,12 @@ height: 32px;
         margin-bottom: 2px;
     }
 
+    p.footer {
+        text-align: center;
+        color: rgb(94, 80, 80);
+        font-size: 10px;
+    }
+
     
 
 /* #Media Queries
