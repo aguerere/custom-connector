@@ -6,7 +6,6 @@ var nconf    = require('nconf');
 var hawk     = require('hawk');
 var errors   = require('express-errors');
 
-var env    = require("./env");
 var users  = require('./users');
 var mailer = require('./mailer');
 var utils  = require('./utils');
@@ -61,7 +60,7 @@ exports.install = function (app) {
         title:  nconf.get('SITE_NAME'),
         messages: [],
         errors: [],
-        signup: env['ENABLE_SIGNUP']
+        signup: nconf.get('ENABLE_SIGNUP')
       });
     });
 
@@ -76,7 +75,7 @@ exports.install = function (app) {
             title:  nconf.get('SITE_NAME'),
             messages: [],
             errors: "The email or password you entered is incorrect.",
-            signup: env['ENABLE_SIGNUP']
+            signup: nconf.get('ENABLE_SIGNUP')
           });
          }
          req.session.user = (req.user = profile);
@@ -146,7 +145,7 @@ exports.install = function (app) {
   });
 
   app.get('/signup', function (req, res) {
-    if (env['ENABLE_SIGNUP']) {
+    if (nconf.get('ENABLE_SIGNUP')) {
       req.session.original_url = req.headers['referer'];
       return res.render('signup', {
         title:  nconf.get('SITE_NAME'),
@@ -173,7 +172,8 @@ exports.install = function (app) {
         res.render('login', {
           title:  nconf.get('SITE_NAME'),
           messages: ['We\'ve just sent you an email to activate your account.'],
-          errors: []
+          errors: [],
+          signup: nconf.get('ENABLE_SIGNUP')
         });
       });
     });
