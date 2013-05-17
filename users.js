@@ -33,7 +33,7 @@ exports.create = function (user, callback) {
       givenName:  ''
     }, 
     emails:       [ { value: user.email } ],
-    active:       false
+    active:       false 
   }
 
   users.push(new_user);
@@ -46,7 +46,7 @@ exports.getProfile = function (email, password, callback) {
     return user.email === email && user.active;
   })[0];
 
-  if (!user) return callback(null, null);
+  if (!user) return callback();
 
   if (password !== user.password) return callback();
   

@@ -8,7 +8,6 @@ var errors   = require('express-errors');
 
 var users  = require('./users');
 var mailer = require('./mailer');
-var utils  = require('./utils');
 
 var issuer = nconf.get('WSFED_ISSUER');
 
@@ -45,6 +44,18 @@ var credentialsFunc = function (id, callback) {
   return callback(null, bewit_credentials);
 };
 
+var renderLogin = function (errors, messages) {
+  return function (req, res) {
+    console.log('rendering login');
+    return res.render('login', {
+      title:    nconf.get('SITE_NAME'),
+      messages: messages,
+      errors:   errors,
+      signup:   nconf.get('ENABLE_SIGNUP')
+    });
+  };
+};
+
 exports.install = function (app) {
   app.get('/wsfed', 
     function (req, res, next) {
@@ -54,15 +65,7 @@ exports.install = function (app) {
       }
       next();
     },
-    function (req, res) {
-      console.log('rendering login');
-      return res.render('login', {
-        title:  nconf.get('SITE_NAME'),
-        messages: [],
-        errors: [],
-        signup: nconf.get('ENABLE_SIGNUP')
-      });
-    });
+    renderLogin());
 
   app.post('/wsfed', function (req, res, next) {
       //authenticate the user, on success call next middleware
@@ -71,12 +74,7 @@ exports.install = function (app) {
       }, function (err, profile) {
          if (err) return next(err);
          if (!profile) {
-          return res.render('login', {
-            title:  nconf.get('SITE_NAME'),
-            messages: [],
-            errors: "The email or password you entered is incorrect.",
-            signup: nconf.get('ENABLE_SIGNUP')
-          });
+          return renderLogin('The email or password you entered is incorrect.')(req, res);
          }
          req.session.user = (req.user = profile);
          return next();
@@ -89,7 +87,7 @@ exports.install = function (app) {
       issuer: issuer
     }));
 
-  app.get('/forgot', function (req, res, next) {
+  app.get('/forgot', function (req, res) {
     req.session.original_url = req.headers['referer'];
     res.render('forgot', {
       title:  nconf.get('SITE_NAME'),
@@ -110,7 +108,7 @@ exports.install = function (app) {
 
       console.log('send email to ' + req.body.email);
       mailer.send(user.email, credentials.key, encodeURIComponent(req.session.original_url), 'invite', function(err) {
-        if (err) { next(err) }
+        if (err) { return next(err); }
         res.render('forgot', {
           title:  nconf.get('SITE_NAME'),
           messages: ['We\'ve just sent you an email to reset your password.'],
@@ -121,7 +119,7 @@ exports.install = function (app) {
   });
 
   app.get('/reset', function (req, res, next) {
-    hawk.uri.authenticate(req, credentialsFunc, {}, function (err, bewit_credentials, attributes) {
+    hawk.uri.authenticate(req, credentialsFunc, {}, function (err) {
       if (err) { return next(errors.Unathorized); }
       return res.render('reset', {
         title: nconf.get('SITE_NAME'),
@@ -137,7 +135,7 @@ exports.install = function (app) {
     users.getUserByEmail(req.body.email, function(err, user) {
       if (err) { return next(err); }
       if(!user) { return next(errors.NotFound); }
-      users.update(user.id, { password: req.body.password }, function(err, updatedUser) {
+      users.update(user.id, { password: req.body.password }, function(err) {
         if (err) { return next(err); }
         res.redirect(req.body.original_url);
       });
@@ -169,23 +167,19 @@ exports.install = function (app) {
 
       mailer.send(user.email, credentials.key, encodeURIComponent(req.session.original_url), 'activate', function(err) {
         if (err) { return next(err); }
-        res.render('login', {
-          title:  nconf.get('SITE_NAME'),
-          messages: ['We\'ve just sent you an email to activate your account.'],
-          errors: [],
-          signup: nconf.get('ENABLE_SIGNUP')
-        });
+        renderLogin('', 'We\'ve just sent you an email to activate your account.')(req, res);
       });
     });
   });
 
   app.get('/activate', function(req, res, next) {
-    hawk.uri.authenticate(req, credentialsFunc, {}, function (err, bewit_credentials, attributes) {
+    hawk.uri.authenticate(req, credentialsFunc, {}, function (err) {
       if (err) { return next(errors.Unathorized); }
       users.getUserByEmail(req.query.email, function(err, user) {
         if (err) { return next(err); }
         if(!user) { return next(errors.NotFound); }
-        users.update(user.id, { active: true }, function(err, user) {
+        users.update(user.id, { active: true }, function(err) {
+          if (err) { return next(err); }
           res.redirect(req.query.original_url);
         });
       });
