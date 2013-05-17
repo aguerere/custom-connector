@@ -33,6 +33,7 @@
     "toml": "~0.4.1",
     "xtend": "~1.0.3",
     "hawk": "~0.13.1",
-    "express-errors": "~0.2.2"
+    "express-errors": "~0.2.2",
+    "url-join": "~0.0.1"
   }
 }

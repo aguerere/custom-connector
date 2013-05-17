@@ -7,7 +7,8 @@ nconf.env('||')
      .defaults({
         PORT:           4000,
         SESSION_SECRET: 'a1b2c3d4567',
-        AUTHENTICATION: 'FORM'
+        AUTHENTICATION: 'FORM',
+        ENABLE_SIGNUP:  true
      });
 
 connectorSetup.run(__dirname, function(err) {
@@ -21,7 +22,7 @@ connectorSetup.run(__dirname, function(err) {
   var express  = require('express');
   var passport = require('passport');
     
-  require('./setupPassport');
+  require('./lib/setupPassport');
 
   var cookieSessions = require('cookie-sessions');
   var app = express();
@@ -42,6 +43,9 @@ connectorSetup.run(__dirname, function(err) {
     }));
 
     this.use(passport.initialize());
+
+    this.use(require('./lib/middleware/bewit'));
+    
     this.use(this.router);
   });
 

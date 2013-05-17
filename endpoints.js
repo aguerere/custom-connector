@@ -6,8 +6,8 @@ var nconf    = require('nconf');
 var hawk     = require('hawk');
 var errors   = require('express-errors');
 
-var users  = require('./users');
-var mailer = require('./mailer');
+var users  = require('./lib/users');
+var mailer = require('./lib/mailer');
 
 var issuer = nconf.get('WSFED_ISSUER');
 
@@ -35,13 +35,9 @@ var respondWsFederation = wsfed.auth({
   }
 });
 
-var credentialsFunc = function (id, callback) {
-  var bewit_credentials = {
-    key: credentials.key,
-    algorithm: 'sha256'
-  };
-
-  return callback(null, bewit_credentials);
+var requireBewit = function (req, res, next) {
+  if (!req.bewit) next(errors.Unathorized);
+  return next();
 };
 
 var renderLogin = function (errors, messages) {
@@ -107,7 +103,7 @@ exports.install = function (app) {
       }
 
       console.log('send email to ' + req.body.email);
-      mailer.send(user.email, credentials.key, encodeURIComponent(req.session.original_url), 'invite', function(err) {
+      mailer.sendReset(user.email, req.session.original_url, function(err) {
         if (err) { return next(err); }
         res.render('forgot', {
           title:  nconf.get('SITE_NAME'),
@@ -118,47 +114,41 @@ exports.install = function (app) {
     });
   });
 
-  app.get('/reset', function (req, res, next) {
-    hawk.uri.authenticate(req, credentialsFunc, {}, function (err) {
-      if (err) { return next(errors.Unathorized); }
-      req.session.changing_password_for = req.query.email;
-      req.session.original_url = req.query.original_url;
+  app.get('/reset', 
+    requireBewit,
+    function (req, res) {
+      req.session.changing_password_for_email = req.bewit.email;
       return res.render('reset', {
-        title: nconf.get('SITE_NAME'),
-        messages: [],
-        errors: []
+        title:        nconf.get('SITE_NAME'),
+        email:        req.bewit.email,
+        original_url: req.bewit.original_url,
+        messages:     [],
+        errors:       []
+      });
+    });
+
+  app.post('/reset', function (req, res, next) {
+    if (req.body.email !== req.session.changing_password_for_email) return next(errors.Unathorized);
+    users.getUserByEmail(req.session.changing_password_for_email, function(err, user) {
+      if (err) { return next(err); }
+      if(!user) { return next(errors.NotFound); }
+      users.update(user.id, { password: req.body.password }, function(err) {
+        if (err) { return next(err); }
+        delete req.session.changing_password_for_email;
+        res.redirect(req.body.original_url);
       });
     });
   });
 
-  app.post('/reset', function (req, res, next) {
-    if (req.session.changing_password_for && req.session.original_url) {
-      users.getUserByEmail(req.session.changing_password_for, function(err, user) {
-        if (err) { return next(err); }
-        if(!user) { return next(errors.NotFound); }
-        users.update(user.id, { password: req.body.password }, function(err) {
-          if (err) { return next(err); }
-          delete req.session.changing_password_for;
-          res.redirect(req.session.original_url);
-        });
-      });
-    }
-    else {
-      next(errors.NotFound);
-    }
-  });
-
   app.get('/signup', function (req, res, next) {
-    if (nconf.get('ENABLE_SIGNUP')) {
-      req.session.original_url = req.headers['referer'];
-      return res.render('signup', {
-        title:  nconf.get('SITE_NAME'),
-        messages: [],
-        errors: [],
-        original_url: req.session.original_url
-      });
-    }
-    next(errors.NotFound);
+    if (!nconf.get('ENABLE_SIGNUP')) return next(errors.NotFound);
+    req.session.original_url = req.headers['referer'];
+    res.render('signup', {
+      title:  nconf.get('SITE_NAME'),
+      messages: [],
+      errors: [],
+      original_url: req.session.original_url
+    });
   });
 
   app.post('/signup', function (req, res, next) {
@@ -171,26 +161,25 @@ exports.install = function (app) {
         });
       }
 
-      mailer.send(user.email, credentials.key, encodeURIComponent(req.session.original_url), 'activate', function(err) {
+      mailer.sendActivation(user.email, req.session.original_url, function(err) {
         if (err) { return next(err); }
         renderLogin('', 'We\'ve just sent you an email to activate your account.')(req, res);
       });
     });
   });
 
-  app.get('/activate', function(req, res, next) {
-    hawk.uri.authenticate(req, credentialsFunc, {}, function (err) {
-      if (err) { return next(errors.Unathorized); }
-      users.getUserByEmail(req.query.email, function(err, user) {
+  app.get('/activate', 
+    requireBewit,
+    function(req, res, next) {
+      users.getUserByEmail(req.bewit.email, function(err, user) {
         if (err) { return next(err); }
         if(!user) { return next(errors.NotFound); }
         users.update(user.id, { active: true }, function(err) {
           if (err) { return next(err); }
-          res.redirect(req.query.original_url);
+          res.redirect(req.bewit.original_url);
         });
       });
     });
-  });
 
   app.get('/logout', function (req, res) {
     if(!req.session.user) return res.send(200);
