@@ -69,7 +69,7 @@ exports.install = function (app) {
       passport.authenticate('local', {
         session: false
       }, function (err, profile) {
-         if (err) return res.send(500, err);
+         if (err) return next(err);
          if (!profile) {
           return res.render('login', {
             title:  nconf.get('SITE_NAME'),
@@ -89,7 +89,7 @@ exports.install = function (app) {
       issuer: issuer
     }));
 
-  app.get('/forgot', function (req, res) {
+  app.get('/forgot', function (req, res, next) {
     req.session.original_url = req.headers['referer'];
     res.render('forgot', {
       title:  nconf.get('SITE_NAME'),
@@ -98,7 +98,7 @@ exports.install = function (app) {
     });
   });
 
-  app.post('/forgot', function (req, res) {
+  app.post('/forgot', function (req, res, next) {
     users.getUserByEmail(req.body.email, function(err, user) {
       if (!user) {
         return res.render('forgot', {
@@ -110,7 +110,7 @@ exports.install = function (app) {
 
       console.log('send email to ' + req.body.email);
       mailer.send(user.email, credentials.key, encodeURIComponent(req.session.original_url), 'invite', function(err) {
-        if (err) { res.send(500, err.message) }
+        if (err) { next(err) }
         res.render('forgot', {
           title:  nconf.get('SITE_NAME'),
           messages: ['We\'ve just sent you an email to reset your password.'],
@@ -120,9 +120,9 @@ exports.install = function (app) {
     });
   });
 
-  app.get('/reset', function (req, res) {
+  app.get('/reset', function (req, res, next) {
     hawk.uri.authenticate(req, credentialsFunc, {}, function (err, bewit_credentials, attributes) {
-      if (err) { return res.send(401); }
+      if (err) { return next(errors.Unathorized); }
       return res.render('reset', {
         title: nconf.get('SITE_NAME'),
         email: req.query.email,
@@ -133,18 +133,18 @@ exports.install = function (app) {
     });
   });
 
-  app.post('/reset', function (req, res) {
+  app.post('/reset', function (req, res, next) {
     users.getUserByEmail(req.body.email, function(err, user) {
-      if (err) { return res.send(500); }
-      if(!user) { return res.send(404); }
+      if (err) { return next(err); }
+      if(!user) { return next(errors.NotFound); }
       users.update(user.id, { password: req.body.password }, function(err, updatedUser) {
-        if (err) { return res.send(500); }
+        if (err) { return next(err); }
         res.redirect(req.body.original_url);
       });
     });
   });
 
-  app.get('/signup', function (req, res) {
+  app.get('/signup', function (req, res, next) {
     if (nconf.get('ENABLE_SIGNUP')) {
       req.session.original_url = req.headers['referer'];
       return res.render('signup', {
@@ -154,10 +154,10 @@ exports.install = function (app) {
         original_url: req.session.original_url
       });
     }
-    res.send(404);
+    next(errors.NotFound);
   });
 
-  app.post('/signup', function (req, res) {
+  app.post('/signup', function (req, res, next) {
     users.create(req.body, function(err, user) {
       if (err) { 
         return res.render('signup', {
@@ -168,7 +168,7 @@ exports.install = function (app) {
       }
 
       mailer.send(user.email, credentials.key, encodeURIComponent(req.session.original_url), 'activate', function(err) {
-        if (err) { return res.send(500, err.message); }
+        if (err) { return next(err); }
         res.render('login', {
           title:  nconf.get('SITE_NAME'),
           messages: ['We\'ve just sent you an email to activate your account.'],
@@ -179,12 +179,12 @@ exports.install = function (app) {
     });
   });
 
-  app.get('/activate', function(req, res) {
+  app.get('/activate', function(req, res, next) {
     hawk.uri.authenticate(req, credentialsFunc, {}, function (err, bewit_credentials, attributes) {
-      if (err) { return res.send(401); }
+      if (err) { return next(errors.Unathorized); }
       users.getUserByEmail(req.query.email, function(err, user) {
-        if (err) { return res.send(500); }
-        if(!user) { return res.send(404); }
+        if (err) { return next(err); }
+        if(!user) { return next(errors.NotFound); }
         users.update(user.id, { active: true }, function(err, user) {
           res.redirect(req.query.original_url);
         });

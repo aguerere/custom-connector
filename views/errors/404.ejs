@@ -1,2 +1,6 @@
-<h1><%= status %> - <%= title %></h1>
-<p><%= error.message %></p>
+<% include ../header %>
+<div class="error">
+  <h1><%= status %></h1>
+  <p><strong><%= title %></strong></p>
+  <p><em><%= error.message %></em></p>
+</div>
