@@ -121,10 +121,10 @@ exports.install = function (app) {
   app.get('/reset', function (req, res, next) {
     hawk.uri.authenticate(req, credentialsFunc, {}, function (err) {
       if (err) { return next(errors.Unathorized); }
+      req.session.changing_password_for = req.query.email;
+      req.session.original_url = req.query.original_url;
       return res.render('reset', {
         title: nconf.get('SITE_NAME'),
-        email: req.query.email,
-        original_url: req.query.original_url,
         messages: [],
         errors: []
       });
@@ -132,14 +132,20 @@ exports.install = function (app) {
   });
 
   app.post('/reset', function (req, res, next) {
-    users.getUserByEmail(req.body.email, function(err, user) {
-      if (err) { return next(err); }
-      if(!user) { return next(errors.NotFound); }
-      users.update(user.id, { password: req.body.password }, function(err) {
+    if (req.session.changing_password_for && req.session.original_url) {
+      users.getUserByEmail(req.session.changing_password_for, function(err, user) {
         if (err) { return next(err); }
-        res.redirect(req.body.original_url);
+        if(!user) { return next(errors.NotFound); }
+        users.update(user.id, { password: req.body.password }, function(err) {
+          if (err) { return next(err); }
+          delete req.session.changing_password_for;
+          res.redirect(req.session.original_url);
+        });
       });
-    });
+    }
+    else {
+      next(errors.NotFound);
+    }
   });
 
   app.get('/signup', function (req, res, next) {
