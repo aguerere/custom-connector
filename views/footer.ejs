@@ -1,18 +1,19 @@
 			<p class="footer">Powered by <a href="http://auth0.com">Auth0</a></p>
 		</div><!-- container -->
 
+		<script type="text/javascript" src="js/jquery-1.9.1.min.js"></script>
 		<script type="text/javascript">
-			var form = document.getElementById("change_password") || document.getElementById("signup");
-			var repeatPassword = document.getElementById("repeatPassword");
-			 
-		  repeatPassword.addEventListener("input", function() {
-		  	var e = form.elements;
-		    if (e['password'].value != repeatPassword.value) {
-		        repeatPassword.setCustomValidity("Please enter the same password");
-		    } else {
-		        repeatPassword.setCustomValidity("");
-		    }
-		  });
+			$(document).ready(function() {
+				var form = document.getElementById("change_password") || document.getElementById("signup");
+
+				$('#repeatPassword', form).bind('input', function() {
+					if ($(this).val() != $('#password', form).val()) {
+				      this.setCustomValidity("Please enter the same password");
+				  } else {
+				      this.setCustomValidity("");
+				  }
+				});
+			});
 		</script>
 	</body>
 </html>
