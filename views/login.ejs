@@ -3,7 +3,11 @@
 	<form method="post">
 		<fieldset>
 			<h2><%= title %></h2>
-			<p><input name="username" type="email" placeholder="Email" required></p>
+			<% if (login_hint) { %>
+				<p><input name="username" type="email" readonly="true" tabindex="-1" value="<%= login_hint %>"></p>
+			<% } else { %>
+				<p><input name="username" type="email" placeholder="Email" required></p>
+			<% } %>
 			<p class="forgot">
 				<a class="forgot" href="/forgot" tabindex="-1">Forgot your password?</a>
 				<input name="password" type="password"  placeholder="Password" required>

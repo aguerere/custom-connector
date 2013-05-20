@@ -44,10 +44,11 @@ var renderLogin = function (errors, messages) {
   return function (req, res) {
     console.log('rendering login');
     return res.render('login', {
-      title:    nconf.get('SITE_NAME'),
-      messages: messages,
-      errors:   errors,
-      signup:   nconf.get('ENABLE_SIGNUP')
+      title:      nconf.get('SITE_NAME'),
+      messages:   messages,
+      errors:     errors,
+      signup:     nconf.get('ENABLE_SIGNUP'),
+      login_hint: req.query.login_hint
     });
   };
 };
