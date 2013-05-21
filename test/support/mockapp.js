@@ -9,10 +9,16 @@ nconf.env('||')
       SESSION_SECRET: 'a1b2c3d4567',
       AUTHENTICATION: 'FORM',
       ENABLE_SIGNUP:  true,
-      WSFED_ISSUER:   'test.com'
+      WSFED_ISSUER:   'test.com',
+      EMAIL_SERVICE:  'GMail',
+      EMAIL_USERNAME: 'mail@test.com',
+      BASE_URL:       'http://localhost:4000',
+      EMAIL_PROTOCOL: 'Stub'
    });
 
 module.exports.createApp = function(done) { 
+  require('../../lib/setupPassport');
+
   var cookieSessions = require('cookie-sessions');
   var app = express();
 
@@ -29,6 +35,10 @@ module.exports.createApp = function(done) {
       secret:         nconf.get('SESSION_SECRET'),
       session_cookie: true
     }));
+
+    this.use(require('../../lib/middleware/bewit'));
+    
+    this.use(this.router);
   });
 
   require('../../endpoints').install(app);

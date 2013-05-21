@@ -8,7 +8,8 @@ nconf.env('||')
         PORT:           4000,
         SESSION_SECRET: 'a1b2c3d4567',
         AUTHENTICATION: 'FORM',
-        ENABLE_SIGNUP:  true
+        ENABLE_SIGNUP:  true,
+        EMAIL_PROTOCOL: 'SMTP'
      });
 
 connectorSetup.run(__dirname, function(err) {

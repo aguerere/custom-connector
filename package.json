@@ -24,7 +24,8 @@
     "mocha": "~1.7.0",
     "request": "~2.11.4",
     "xunit-file": "0.0.1",
-    "path": "~0.4.9"
+    "path": "~0.4.9",
+    "jsdom": "0.6.5"
   },
   "dependencies": {
     "async": "~0.1.22",
