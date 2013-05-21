@@ -1,0 +1,4 @@
+--require should
+--reporter list
+--globals Functions,Utilities
+-t 20000
