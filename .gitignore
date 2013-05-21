@@ -4,3 +4,4 @@ config.json
 npm-debug.log
 .rnd
 certs/cert*
+coverage.html

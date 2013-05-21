@@ -25,7 +25,8 @@
     "request": "~2.11.4",
     "xunit-file": "0.0.1",
     "path": "~0.4.9",
-    "jsdom": "0.6.5"
+    "jsdom": "0.6.5",
+    "jscoverage": "0.3.7"
   },
   "dependencies": {
     "async": "~0.1.22",

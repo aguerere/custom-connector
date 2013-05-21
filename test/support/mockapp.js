@@ -41,7 +41,7 @@ module.exports.createApp = function(done) {
     this.use(this.router);
   });
 
-  require('../../endpoints').install(app);
+  process.env.EXPRESS_COV ? require('../../endpoints-cov').install(app) : require('../../endpoints').install(app);
 
   return http.createServer(app).listen(nconf.get('PORT'), done);
 };
