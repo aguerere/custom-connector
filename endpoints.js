@@ -40,12 +40,13 @@ var requireBewit = function (req, res, next) {
   return next();
 };
 
-var renderLogin = function (errors, messages) {
+var renderLogin = function (errors) {
   return function (req, res) {
-    console.log('rendering login');
+    var message = req.session.message;
+    delete req.session.message;
     return res.render('login', {
       title:      nconf.get('SITE_NAME'),
-      messages:   messages,
+      messages:   message,
       errors:     errors,
       signup:     nconf.get('ENABLE_SIGNUP'),
       login_hint: req.query.login_hint,
@@ -131,14 +132,11 @@ exports.install = function (app) {
 
   app.post('/reset', function (req, res, next) {
     if (req.body.email !== req.session.changing_password_for_email) return next(errors.Unathorized);
-    users.getUserByEmail(req.session.changing_password_for_email, function(err, user) {
+    users.changePassword(req.body.email, req.body.password, function(err) {
       if (err) { return next(err); }
-      if(!user) { return next(errors.NotFound); }
-      users.update(user.id, { password: req.body.password }, function(err) {
-        if (err) { return next(err); }
-        delete req.session.changing_password_for_email;
-        res.redirect(req.body.original_url);
-      });
+      req.session.message = "You have successfully changed your password";
+      delete req.session.changing_password_for_email;
+      res.redirect(req.body.original_url);
     });
   });
 
@@ -165,7 +163,8 @@ exports.install = function (app) {
 
       mailer.sendActivation(user.email, req.session.original_url, function(err) {
         if (err) { return next(err); }
-        renderLogin('', 'We\'ve just sent you an email to activate your account.')(req, res);
+        req.session.message = 'We\'ve just sent you an email to activate your account.';
+        res.redirect(req.session.original_url);
       });
     });
   });
@@ -173,13 +172,10 @@ exports.install = function (app) {
   app.get('/activate', 
     requireBewit,
     function(req, res, next) {
-      users.getUserByEmail(req.bewit.email, function(err, user) {
+      users.activate(req.bewit.email, function(err) {
         if (err) { return next(err); }
-        if(!user) { return next(errors.NotFound); }
-        users.update(user.id, { active: true }, function(err) {
-          if (err) { return next(err); }
-          res.redirect(req.bewit.original_url);
-        });
+        req.session.message = "Your account has been activated";
+        res.redirect(req.bewit.original_url);
       });
     });
 
