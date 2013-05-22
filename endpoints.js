@@ -48,7 +48,8 @@ var renderLogin = function (errors, messages) {
       messages:   messages,
       errors:     errors,
       signup:     nconf.get('ENABLE_SIGNUP'),
-      login_hint: req.query.login_hint
+      login_hint: req.query.login_hint,
+      email:      req.body.username !== undefined ? req.body.username : ""
     });
   };
 };

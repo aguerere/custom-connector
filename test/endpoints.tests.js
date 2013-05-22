@@ -66,6 +66,25 @@ describe('endpoints', function () {
     });
   });
 
+  it('should render the login view with email input after fails', function (done) {
+    var form = {
+      username: 'notExists@mail.com',
+      password: 'password'
+    };
+
+    request.post('http://localhost:4000/wsfed', {form: form}, function (err, res) {
+      jsdom.env(
+        res.body,
+        ["http://code.jquery.com/jquery.js"],
+        function(errors, window) {
+          res.statusCode.should.eql(200);
+          window.$("input[name='username']").val().should.eql('notExists@mail.com');
+          done();
+        }
+      );
+    });
+  });
+
   it('should render the forgot view', function (done) {
     request.get('http://localhost:4000/forgot', function (err, res) {
       jsdom.env(

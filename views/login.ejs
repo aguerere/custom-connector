@@ -6,7 +6,7 @@
 			<% if (login_hint) { %>
 				<p><input name="username" type="email" readonly="true" tabindex="-1" value="<%= login_hint %>"></p>
 			<% } else { %>
-				<p><input name="username" type="email" placeholder="Email" required></p>
+				<p><input name="username" type="email" placeholder="Email" value="<%= email %>" required autofocus></p>
 			<% } %>
 			<p class="forgot">
 				<a class="forgot" href="/forgot" tabindex="-1">Forgot your password?</a>
