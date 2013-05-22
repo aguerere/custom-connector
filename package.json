@@ -42,7 +42,7 @@
     "nodemailer": "~0.4.1",
     "toml": "~0.4.1",
     "xtend": "~1.0.3",
-    "hawk": "~0.13.1",
+    "hawk": "https://github.com/jfromaniello/hawk/tarball/https-on-proxy-bug",
     "express-errors": "~0.2.2",
     "url-join": "~0.0.1"
   }
