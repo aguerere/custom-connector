@@ -121,7 +121,7 @@ exports.install = function (app) {
     requireBewit,
     function (req, res) {
       req.session.changing_password_for_email = req.bewit.email;
-      return res.render('reset', {
+      res.render('reset', {
         title:        nconf.get('SITE_NAME'),
         email:        req.bewit.email,
         original_url: req.bewit.original_url,

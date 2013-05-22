@@ -2,6 +2,7 @@ var path     = require('path');
 var http     = require('http');
 var express  = require('express');
 var nconf    = require('nconf');
+var passport = require('passport');
 
 nconf.env('||')
    .defaults({
@@ -13,7 +14,8 @@ nconf.env('||')
       EMAIL_SERVICE:  'GMail',
       EMAIL_USERNAME: 'mail@test.com',
       BASE_URL:       'http://localhost:4000',
-      EMAIL_PROTOCOL: 'Stub'
+      EMAIL_PROTOCOL: 'Stub',
+      test:           'https://test.auth0.com/login/callback'
    });
 
 module.exports.createApp = function(done) { 
@@ -36,12 +38,14 @@ module.exports.createApp = function(done) {
       session_cookie: true
     }));
 
+    this.use(passport.initialize());
+
     this.use(require('../../lib/middleware/bewit'));
     
     this.use(this.router);
   });
 
-  process.env.EXPRESS_COV ? require('../../endpoints-cov').install(app) : require('../../endpoints').install(app);
+  require('../../endpoints').install(app);
 
   return http.createServer(app).listen(nconf.get('PORT'), done);
 };

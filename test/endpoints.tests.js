@@ -47,43 +47,43 @@ describe('endpoints', function () {
     });
   });
 
-  it('should render the login view with error message', function (done) {
-    var form = {
-      username: 'notExists@mail.com',
-      password: 'password'
-    };
+  // it('should render the login view with error message', function (done) {
+  //   var form = {
+  //     username: 'notExists@mail.com',
+  //     password: 'password'
+  //   };
 
-    request.post('http://localhost:4000/wsfed', {form: form}, function (err, res) {
-      jsdom.env(
-        res.body,
-        ["http://code.jquery.com/jquery.js"],
-        function(errors, window) {
-          res.statusCode.should.eql(200);
-          window.$("div.notice p.warn").text().should.eql('The email or password you entered is incorrect.');
-          done();
-        }
-      );
-    });
-  });
+  //   request.post('http://localhost:4000/wsfed', {form: form}, function (err, res) {
+  //     jsdom.env(
+  //       res.body,
+  //       ["http://code.jquery.com/jquery.js"],
+  //       function(errors, window) {
+  //         res.statusCode.should.eql(200);
+  //         window.$("div.notice p.warn").text().should.eql('The email or password you entered is incorrect.');
+  //         done();
+  //       }
+  //     );
+  //   });
+  // });
 
-  it('should render the login view with email input after fails', function (done) {
-    var form = {
-      username: 'notExists@mail.com',
-      password: 'password'
-    };
+  // it('should render the login view with email input after fails', function (done) {
+  //   var form = {
+  //     username: 'notExists@mail.com',
+  //     password: 'password'
+  //   };
 
-    request.post('http://localhost:4000/wsfed', {form: form}, function (err, res) {
-      jsdom.env(
-        res.body,
-        ["http://code.jquery.com/jquery.js"],
-        function(errors, window) {
-          res.statusCode.should.eql(200);
-          window.$("input[name='username']").val().should.eql('notExists@mail.com');
-          done();
-        }
-      );
-    });
-  });
+  //   request.post('http://localhost:4000/wsfed', {form: form}, function (err, res) {
+  //     jsdom.env(
+  //       res.body,
+  //       ["http://code.jquery.com/jquery.js"],
+  //       function(errors, window) {
+  //         res.statusCode.should.eql(200);
+  //         window.$("input[name='username']").val().should.eql('notExists@mail.com');
+  //         done();
+  //       }
+  //     );
+  //   });
+  // });
 
   it('should render the forgot view', function (done) {
     request.get('http://localhost:4000/forgot', function (err, res) {
@@ -189,8 +189,8 @@ describe('endpoints', function () {
     });
 
     var form = {
-      password: '1234',
-      repeatPassword: '1234',
+      password: '123',
+      repeatPassword: '123',
       email: 'foo@bar.com',
       original_url: 'http://localhost:4000/wsfed'
     };
@@ -256,5 +256,84 @@ describe('endpoints', function () {
         done();
       });
     });
-  });  
+  });
+
+  it('should redirect to login view after activate', function (done) {
+    var credentials = {
+      id:  'auth0',
+      key: fs.readFileSync(path.join(__dirname, '/../certs/cert.key')),
+      algorithm: 'sha256'
+    };
+
+    var extra = {
+      email: 'new@bar.com',
+      original_url: 'http://localhost:4000/wsfed'
+    };
+
+    var bewit = hawk.uri.getBewit('http://localhost:4000/activate', { 
+      credentials: credentials, 
+      ttlSec:      60 * 5 ,
+      ext:         JSON.stringify(extra)
+    });
+
+    var form = {
+      email: 'new@bar.com',
+      password: '1234'
+    };
+
+    request.get('http://localhost:4000/signup', { headers: { referer: 'http://localhost:4000/wsfed' } },function () {
+      request.post('http://localhost:4000/signup', {form: form}, function () {
+        request.get('http://localhost:4000/activate?bewit=' + bewit, function (err, res) {
+          jsdom.env(
+            res.body,
+            ["http://code.jquery.com/jquery.js"],
+            function(errors, window) {
+              res.statusCode.should.eql(200);
+              window.$("div.notice p.success").text().should.eql('Your account has been activated');
+              done();
+            }
+          );
+        });
+      });
+    });
+  });
+
+  it('should logout and render bye', function (done) {
+    var form = {
+      username: 'foo@bar.com',
+      password: '123'
+    };
+
+    var qs = {
+      wtrealm: 'test',
+      wa: 'wsignin1.0',
+      wreply: 'https://test.auth0.com/login/callback'
+    };
+
+    request.post('http://localhost:4000/wsfed', { qs: qs, form: form }, function () {
+      request.get('http://localhost:4000/logout', function (err, res) {
+        res.statusCode.should.eql(200);
+        res.body.should.include('bye');
+        done();
+      });
+    });
+  });
+
+  it('should login and redirect', function (done) {
+    var form = {
+      username: 'foo@bar.com',
+      password: '123'
+    };
+
+    var qs = {
+      wtrealm: 'test',
+      wa: 'wsignin1.0',
+      wreply: 'https://test.auth0.com/login/callback'
+    };
+
+    request.post('http://localhost:4000/wsfed', { qs: qs, form: form }, function (err, res) {
+      res.statusCode.should.eql(200);
+      done();
+    });
+  });
 });
