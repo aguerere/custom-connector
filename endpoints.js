@@ -157,7 +157,8 @@ exports.install = function (app) {
         return res.render('signup', {
           title:  nconf.get('SITE_NAME'),
           messages: [],
-          errors: [err]
+          errors: [err],
+          original_url: req.session.original_url
         });
       }
 

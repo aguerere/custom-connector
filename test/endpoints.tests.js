@@ -203,4 +203,58 @@ describe('endpoints', function () {
       });
     });
   });
+
+  it('should render the signup view', function (done) {
+    request.get('http://localhost:4000/signup', function (err, res) {
+      jsdom.env(
+        res.body,
+        ["http://code.jquery.com/jquery.js"],
+        function(errors, window) {
+          res.statusCode.should.eql(200);
+          window.$("input[name='email']").attr('type').should.eql('email');
+          window.$("input[name='password']").attr('type').should.eql('password');
+          window.$("input[name='repeatPassword']").attr('type').should.eql('password');
+          window.$.trim(window.$("button[type='submit']").text()).should.eql('Sign up');
+          window.$.trim(window.$("p.forgot").text()).should.eql('Already have an account? Sign in.');
+          done();
+        }
+      );
+    });
+  });
+
+  it('should render the signup view with error message', function (done) {
+    var form = {
+      email: 'foo@bar.com',
+      password: '1234'
+    };
+
+    request.get('http://localhost:4000/signup', { headers: { referer: 'http://localhost:4000/wsfed' } },function () {
+      request.post('http://localhost:4000/signup', {form: form}, function (err, res) {
+        jsdom.env(
+          res.body,
+          ["http://code.jquery.com/jquery.js"],
+          function(errors, window) {
+            res.statusCode.should.eql(200);
+            window.$("div.notice p.warn").text().should.eql('User Exists');
+            done();
+          }
+        );
+      });
+    });
+  });
+
+  it('should redirect to login view after signup', function (done) {
+    var form = {
+      email: 'new@bar.com',
+      password: '1234'
+    };
+
+    request.get('http://localhost:4000/signup', { headers: { referer: 'http://localhost:4000/wsfed' } },function () {
+      request.post('http://localhost:4000/signup', {form: form}, function (err, res) {
+        res.statusCode.should.eql(302);
+        res.headers['location'].should.eql('http://localhost:4000/wsfed');
+        done();
+      });
+    });
+  });  
 });
