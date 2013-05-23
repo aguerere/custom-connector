@@ -44,6 +44,7 @@
     "xtend": "~1.0.3",
     "hawk": "https://github.com/jfromaniello/hawk/tarball/https-on-proxy-bug",
     "express-errors": "~0.2.2",
-    "url-join": "~0.0.1"
+    "url-join": "~0.0.1",
+    "express-passport-logout": "~0.1.0"
   }
 }

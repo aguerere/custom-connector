@@ -5,6 +5,7 @@ var wsfed    = require('wsfed');
 var nconf    = require('nconf');
 var hawk     = require('hawk');
 var errors   = require('express-errors');
+var logout   = require('express-passport-logout');
 
 var users  = require('./lib/users');
 var mailer = require('./lib/mailer');
@@ -180,14 +181,7 @@ exports.install = function (app) {
       });
     });
 
-  app.get('/logout', function (req, res) {
-    if(!req.session.user) return res.send(200);
-    
-    console.log('user ' + req.session.user.displayName.green + ' logged out');
-    req.logout();
-    delete req.session;
-    return res.send('bye');
-  });
+  app.get('/logout', logout());
 
   errors.bind(app, { layout: false });
 };

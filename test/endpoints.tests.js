@@ -319,6 +319,27 @@ describe('endpoints', function () {
     });
   });
 
+  it('should logout and redirect if returnTo qs is present', function (done) {
+    var form = {
+      username: 'foo@bar.com',
+      password: '123'
+    };
+
+    var qs = {
+      wtrealm: 'test',
+      wa: 'wsignin1.0',
+      wreply: 'https://test.auth0.com/login/callback'
+    };
+
+    request.post('http://localhost:4000/wsfed', { qs: qs, form: form }, function () {
+      request.get({url: 'http://localhost:4000/logout?returnTo=http://mysite.com', followRedirect: false }, function (err, res) {
+        res.statusCode.should.eql(302);
+        res.headers.location.should.eql('http://mysite.com');
+        done();
+      });
+    });
+  });
+
   it('should login and redirect', function (done) {
     var form = {
       username: 'foo@bar.com',
