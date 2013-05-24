@@ -7,6 +7,8 @@ nconf.env('||')
      .defaults({
         PORT:           4000,
         SESSION_SECRET: 'a1b2c3d4567',
+        SESSION_COOKIE: true,
+        SESSION_TIMEOUT_IN_SECONDS: 60 * 60 * 8, // 8 hours
         AUTHENTICATION: 'FORM',
         ENABLE_SIGNUP:  true,
         EMAIL_PROTOCOL: 'SMTP'
@@ -40,7 +42,8 @@ connectorSetup.run(__dirname, function(err) {
     this.use(cookieSessions({
       session_key:    'sqlfs',
       secret:         nconf.get('SESSION_SECRET'),
-      session_cookie: true
+      session_cookie: nconf.get('SESSION_COOKIE'),
+      timeout: nconf.get('SESSION_TIMEOUT_IN_SECONDS') * 1000
     }));
 
     this.use(passport.initialize());
