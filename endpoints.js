@@ -11,6 +11,7 @@ var users  = require('./lib/users');
 var mailer = require('./lib/mailer');
 
 var issuer = nconf.get('WSFED_ISSUER');
+var tokenLifetime = nconf.get('SESSION_TIMEOUT_IN_SECONDS');
 
 var credentials = {
   cert: fs.readFileSync(path.join(__dirname, '/certs/cert.pem')),
@@ -19,6 +20,7 @@ var credentials = {
 
 var respondWsFederation = wsfed.auth({
   issuer:      issuer,
+  lifetime:    tokenLifetime,
   cert:        credentials.cert,
   key:         credentials.key,
   getPostURL:  function (wtrealm, wreply, req, callback) {

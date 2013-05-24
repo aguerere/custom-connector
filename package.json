@@ -37,7 +37,7 @@
     "cookie-sessions": "https://github.com/auth0/cookie-sessions/tarball/master",
     "nconf":           "https://github.com/jfromaniello/nconf/tarball/master",
     "connector-setup": "https://github.com/auth0/connector-setup/tarball/master",
-    "wsfed": "~0.3.3",
+    "wsfed": "~0.3.5",
     "colors": "~0.6.0-1",
     "nodemailer": "~0.4.1",
     "toml": "~0.4.1",
