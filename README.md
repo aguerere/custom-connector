@@ -4,7 +4,7 @@ It speaks Ws-Federation with Saml11 tokens.
 
 ## Customize the user validation mechanism
 
-You can customize the way user and password are validated by changing the ```user.js``` file. 
+You can customize the way user and password are validated by changing the ```user.js``` file.
 
 There are some examples in the example folder.
 
@@ -28,6 +28,14 @@ If you add required attributes, *e.g. phone_number*, to ```user.js``` you can ad
 
 	<p><input name="phone_number" type="text" id="phone_number" required ></p>
 
+## Issue Reporting
+
+If you have found a bug or if you have a feature request, please report them at this repository issues section. Please do not report security vulnerabilities on the public GitHub issue tracker. The [Responsible Disclosure Program](https://auth0.com/whitehat) details the procedure for disclosing security issues.
+
+## Author
+
+[Auth0](auth0.com)
+
 ## License
 
-MIT!
+This project is licensed under the MIT license. See the [LICENSE](LICENSE) file for more info.
